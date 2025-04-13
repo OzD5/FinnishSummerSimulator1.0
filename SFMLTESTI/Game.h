@@ -16,7 +16,6 @@
 class Game
 {
 private:
-	//Always private variables
 	sf::RenderWindow* window;
 	sf::Event ev;
 	sf::VideoMode videoMode;
@@ -27,9 +26,15 @@ private:
 	//Recources
 	sf::Font font;
 
-	sf::Text uiText;
+	sf::Text scoreText;
+
+	sf::Text healthText;
+	sf::Text staminaText;
 	sf::RectangleShape healthBar;
 	sf::RectangleShape staminaBar;
+
+	sf::RectangleShape healthOutline;
+	sf::RectangleShape staminaOutline;
 
 	//Sounds
 	sf::Music musicOST;
@@ -43,30 +48,38 @@ private:
 	sf::SoundBuffer hittingInsectFile;
 	sf::Sound hittingInsectSound;
 	// Game Logic
-	bool isMiss;
-	bool isTouching;
-	bool endGame;
-	bool isStaminaRegen;
-
-
 	short difficulty;
+	unsigned windowHeight;
+	unsigned windowWidth;
+
+	float heightRatio;
+	float widthRatio;
+
+	bool endGame;
 	unsigned int highscore;
-	int points;
+	unsigned int points;
+
 	float enemySpawnTimer;
 	float enemySpawnTimerMax;
 	int maxEnemies;
 	long long health;
+
+
 	bool mouseHeld;
+	bool isTouching;
+	bool isMiss;
+	bool isStaminaRegen;
+	
 	float speedX;
 	float speedY;
-	int mltplr;
+	unsigned int mltplr;
 
 	sf::Clock regenClock;
 
 	//Game objects
 	sf::Texture handTexture;
 	sf::Sprite hairyHand;
-	std::vector < Enemy > enemies;
+	std::vector<Enemy> enemies;
 
 	//Graphics
 	sf::Texture backGround;
@@ -85,6 +98,9 @@ private:
 	void initWindow();
 	void initFonts();
 	void initUi();
+	void initText(sf::Text& textObj, std::string text, int size, float x, float y) const;
+	void initBar(sf::RectangleShape& bar, float x, float y, sf::Color color) const;
+	void initOutline(sf::RectangleShape& outline, float x, float y) const;
 	void initGraphics();
 	void initSounds();
 	void initHand();
@@ -97,7 +113,10 @@ private:
 	void updateUi();
 	void updateSpeed();
 	void deleteEnemy();
-	void moveEnemies();
+	void updateEnemies();
+	void updateEnemyPosition(Enemy& enemy);
+	float calculateWaveX(float enemyY, int velocity, int offset) const; 
+	void checkEnemyBounds(Enemy& enemy);
 	void moveHand();
 
 	void renderBlood(sf::RenderTarget& target);
@@ -105,7 +124,7 @@ private:
 	void renderRects(sf::RenderTarget& target);
 public:
 	//construction / destruction
-	Game(short difficulty);
+	Game(short difficulty, unsigned windowWidth, unsigned windowHeight);
 	virtual ~Game();
 
 	//Accessors

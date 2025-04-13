@@ -7,6 +7,8 @@ int main()
 {
 	//1,2,3 difficulty = easy,medium,hard
 	short difficulty = 2;
+	unsigned windowWidth = 2560;
+	unsigned windowHeight = 1440 ;
 	//init rand gen
 	std::srand(static_cast<unsigned>(time(NULL)));
 
@@ -15,7 +17,7 @@ int main()
 	float fps = 0.0f; 
 
 	// Game object
-	StartMenu* startMenu = new StartMenu();
+	StartMenu* startMenu = new StartMenu(windowWidth, windowHeight);
 	while (startMenu->running() && !startMenu->getEndMenu())
 	{
 		startMenu->update();
@@ -30,7 +32,7 @@ int main()
 
 	delete startMenu;
 
-	Game game(difficulty);
+	Game game(difficulty, windowWidth, windowHeight);
 
 	
 	//Game loop

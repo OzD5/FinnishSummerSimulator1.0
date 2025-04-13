@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <iostream>
+#include <string>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
@@ -32,6 +33,10 @@ private:
 	sf::Sprite startButton;
 	sf::Sprite difficultyButton;
 	sf::Sprite exitButton;
+
+	unsigned windowHeight;
+	unsigned windowWidth;
+
 	bool endMenu;
 	bool mouseHold;
 	bool startGame;
@@ -44,6 +49,9 @@ private:
 	void initWindow();
 	void initVariables();
 	void initUI();
+	const bool loadRecources();
+	void setupButton(sf::Sprite& button, float x, float y) const;
+	void setupText(sf::Text& buttonText, const std::string& text, float x, float y) const;
 	void initSound();
 	void pollEvents();
 	void renderButtons(sf::RenderTarget& target);
@@ -56,6 +64,6 @@ public:
 	bool getStartGame() const;
 	const bool running() const;
 
-	StartMenu();
+	StartMenu(unsigned width, unsigned height);
 	virtual ~StartMenu();
 };

@@ -7,7 +7,8 @@
 void Game::initVariables()
 {
 	this->window = nullptr;
-
+	this->widthRatio = this->windowWidth / 1920.f;
+	this->heightRatio = this->windowHeight / 1080.f;
 	//Game logic
 	this->endGame = false;
 	this->highscore = Save::getHighscore();
@@ -15,16 +16,16 @@ void Game::initVariables()
 	this->enemySpawnTimerMax = 200.f;
 	if (this->difficulty == 4)
 	{
-		this->enemySpawnTimer = 0.001f;
-		this->enemySpawnTimerMax = 0.001f;
-		this->maxEnemies = 1000000000;
-		this->health = 1000000000;
+		this->enemySpawnTimer = 1.f;
+		this->enemySpawnTimerMax = 1.f;
+		this->maxEnemies = 1000;
+		this->health = 10000000;
 	}
 	else
 	{
 		this->enemySpawnTimer = this->enemySpawnTimerMax;
 		this->maxEnemies = 7 * this->difficulty;
-		this->health = 1000 - 100 * this->difficulty;
+		this->health = 1100 - 100 * this->difficulty;
 	}
 	/*
 	this->enemySpawnTimerMax = 0.1f;
@@ -37,16 +38,16 @@ void Game::initVariables()
 	this->isMiss = false;
 	this->isStaminaRegen = false;
 	this->speedX = 5.f;
-	this->speedY = 1.f*this->difficulty;
+	this->speedY = 1.f * this->difficulty;
 	this->mltplr = 1;
 }
 
 void Game::initWindow()
 {
-	this->videoMode.height = 1080;
-	this->videoMode.width = 1920;
+	this->videoMode.height = this->windowHeight;
+	this->videoMode.width = this->windowWidth;
 
-	this->window = new sf::RenderWindow(this->videoMode, "Mosquito Game", sf::Style::Titlebar | sf::Style::Close);
+	this->window = new sf::RenderWindow(this->videoMode, "Finnish Summer Simulator", sf::Style::Titlebar | sf::Style::Close);
 	this->window->setFramerateLimit(240);
 
 }
@@ -63,22 +64,60 @@ void Game::initFonts()
 void Game::initUi()
 {
 	//Scores etc. in uitext
-	this->uiText.setFont(this->font);
-	this->uiText.setCharacterSize(48);
-	this->uiText.setFillColor(sf::Color::White);
-	this->uiText.setOutlineColor(sf::Color::Black);
-	this->uiText.setOutlineThickness(0.5);
-	this->uiText.setString("NONE");
+	this->scoreText.setFont(this->font);
+	this->scoreText.setCharacterSize(48);
+	this->scoreText.setFillColor(sf::Color::White);
+	this->scoreText.setOutlineColor(sf::Color::Black);
+	this->scoreText.setOutlineThickness(0.5);
+	this->scoreText.setString("NONE");
+	this->scoreText.setScale(this->widthRatio, this->heightRatio);
 
-	//Healthbar and Stamina Bar
-	this->healthBar.setSize(sf::Vector2f(200.f, 20.f));
-	this->healthBar.setPosition(sf::Vector2f(20.f, 200.f));
-	this->healthBar.setFillColor(sf::Color::Green);
+	//Healthbar, Stamina Bar and their outlines
 
-	this->staminaBar.setSize(sf::Vector2f(200.f, 20.f));
-	this->staminaBar.setPosition(sf::Vector2f(20.f, 235.f));
-	this->staminaBar.setFillColor(sf::Color::Blue);
+	initBar(healthBar, 20.f, 950.f, sf::Color::Green);
+	initBar(staminaBar, 20.f, 900.f, sf::Color::Blue);
 
+	initOutline(this->healthOutline, 20.f, 950.f);
+	initOutline(this->staminaOutline, 20.f, 900.f);
+
+	initText(scoreText, "NONE", 48, 5.f*this->widthRatio, 10.f*this->heightRatio);
+	initText(this->healthText, "Health: ", 15,
+		this->healthBar.getPosition().x + this->healthBar.getGlobalBounds().width + 20.f,
+		this->healthBar.getPosition().y);
+	initText(this->staminaText, "Stamina: ", 15,
+		this->staminaBar.getPosition().x + this->staminaBar.getGlobalBounds().width + 20.f,
+		this->staminaBar.getPosition().y);
+}
+
+void Game::initText(sf::Text& textObj, std::string text, int size, float x, float y) const
+{
+	textObj.setFont(this->font);
+	textObj.setCharacterSize(size);
+	textObj.setFillColor(sf::Color::White);
+	textObj.setOutlineColor(sf::Color::Black);
+	textObj.setOutlineThickness(0.5);
+	textObj.setString(text);
+	textObj.setPosition(x, y);
+	textObj.setScale(this->widthRatio, this->heightRatio);
+
+}
+
+void Game::initBar(sf::RectangleShape& bar, float x, float y, sf::Color color) const
+{
+	bar.setSize(sf::Vector2f(200.f, 20.f));
+	bar.setPosition(sf::Vector2f(this->widthRatio * x, this->heightRatio * y));
+	bar.setFillColor(color);
+	bar.setScale(this->widthRatio * 1.5f, this->heightRatio);
+}
+
+void Game::initOutline(sf::RectangleShape& outline, float x, float y) const
+{
+	outline.setSize(sf::Vector2f(200.f, 20.f));
+	outline.setPosition(sf::Vector2f(this->widthRatio * x, this->heightRatio * y));
+	outline.setFillColor(sf::Color(0, 0, 0, 0));
+	outline.setOutlineColor(sf::Color::Black);
+	outline.setOutlineThickness(-1.f);
+	outline.setScale(this->widthRatio * 1.5f, this->heightRatio);
 }
 
 void Game::initGraphics()
@@ -90,7 +129,7 @@ void Game::initGraphics()
 	else
 	{
 		this->bloodBathObj.setTexture(bloodBath);
-		this->bloodBathObj.setScale(2.0f, 2.0f);
+		this->bloodBathObj.setScale(2.0f * this->widthRatio, 2.0f * this->heightRatio);
 	}
 	if (!(this->backGround).loadFromFile("Data/Graphics/GameBG.png"))
 	{
@@ -99,7 +138,7 @@ void Game::initGraphics()
 	else
 	{
 		this->backGroundObj.setTexture(backGround);
-		this->backGroundObj.setScale(1.3f, 1.1f);
+		this->backGroundObj.setScale(1.3f * this->widthRatio, 1.1f * this->heightRatio);
 		this->backGroundObj.setPosition(0, 0);
 	}
 	//Jos haluut brainrot V:n niin enemy1 ja enemy.png
@@ -128,7 +167,7 @@ void Game::initSounds()
 		musicFile = "Data/Sounds/mainOST2.2.wav";
 		break;
 	case 4:
-		musicFile = "Data/Sounds/mainOST4.ogg";
+		musicFile = "Data/Sounds/mainOST2.wav";
 		break;
 	default:
 		musicFile = "Data/Sounds/mainOST2.wav";
@@ -163,7 +202,7 @@ void Game::initSounds()
 	this->hittingInsectSound.setBuffer(this->hittingInsectFile);
 	this->hittingInsectSound.setVolume(50);
 
-		
+
 }
 void Game::initHand()
 {
@@ -173,14 +212,16 @@ void Game::initHand()
 		std::cout << "ENEMY::INITGRAPHICS::HAIRYARM.PNG NOT FOUND";
 	}
 	this->hairyHand.setTexture(this->handTexture);
-	this->hairyHand.setScale(sf::Vector2f(2.1f, 1.f));
-	this->hairyHand.setPosition(-10.f, 700.f);
+	this->hairyHand.setScale(sf::Vector2f(2.1f * this->widthRatio, 0.9f * this->heightRatio));
+	this->hairyHand.setPosition(-10.f, 0.6f * this->windowHeight);
 }
 
 //Constructori/Destructori
-Game::Game(short difficulty)
+Game::Game(short difficulty, unsigned windowWidth, unsigned windowHeight)
 {
 	this->difficulty = difficulty;
+	this->windowWidth = windowWidth;
+	this->windowHeight = windowHeight;
 	this->initVariables();
 	this->initWindow();
 	this->initHand();
@@ -211,46 +252,31 @@ const bool Game::getEndGame() const
 	return this->endGame;
 }
 
+
+//C
 void Game::spawnEnemy()
 {
 	/*
-		Spawn enemies with random color and random enemy
+		Spawn enemies with random color, random type, and random velocity
 	*/
 	int type = (rand() % 7) + 1;
-	sf::Texture* mosquitoPic;
-	if (rand() % 2 == 1)
-		mosquitoPic = &mosquitoL;
-	else mosquitoPic = &mosquitoR;
+	//Look direction of mosquito.
+	sf::Texture* mosquitoPic = (rand() % 2 == 1) ? mosquitoPic = &mosquitoL : &mosquitoR;
 	//Init new enemy
 	Enemy newEnemy(*mosquitoPic, sf::Vector2f(static_cast<float>(rand() % (static_cast<int>(this->window->getSize().x - 50.f)) + 50.f),
-		0.f), type,(rand() % 100)*10);
+		0.f), type, (rand() % 100) * 10);
 
-	switch (type)
-	{
-	case 7:
-		newEnemy.setSize(0.01f*sf::Vector2f(55.f, 30.f));
-		break;
-	case 6:
-		newEnemy.setSize(0.01f * sf::Vector2f(60.f , 70.f ));
-		break;
-	case 5:
-		newEnemy.setSize(0.01f * sf::Vector2f(65.f , 30.f ));
-	case 4:
-		newEnemy.setSize(0.01f * sf::Vector2f(85.f , 50.f ));
-		break;
-	case 3:
-		newEnemy.setSize(0.01f * sf::Vector2f(45.f, 90.f ));
-		break;
-	case 2:
-		newEnemy.setSize(0.01f * sf::Vector2f(70.f , 70.f ));
-		break;
-	case 1:
-		newEnemy.setSize(0.01f * sf::Vector2f(75.f , 95.f));
-		break;
-	default:
-		newEnemy.setSize(0.01f * sf::Vector2f(100.f , 90.f ));
-		break;
-	}
+	std::map<int, sf::Vector2f> sizeMap = {
+	  {7, sf::Vector2f(55.f, 30.f)},
+	  {6, sf::Vector2f(60.f, 70.f)},
+	  {5, sf::Vector2f(65.f, 30.f)},
+	  {4, sf::Vector2f(85.f, 50.f)},
+	  {3, sf::Vector2f(45.f, 90.f)},
+	  {2, sf::Vector2f(70.f, 70.f)},
+	  {1, sf::Vector2f(75.f, 95.f)}
+	};
+	newEnemy.setSize(0.01f * sizeMap[type]);
+
 	this->enemies.push_back(newEnemy);
 
 }
@@ -261,13 +287,12 @@ void Game::pollEvents()
 	{
 		switch (this->ev.type)
 		{
-			//Ikkunan sulkeminen
 		case sf::Event::Closed:
 			this->window->close();
 			break;
+
 		case sf::Event::KeyPressed:
-			if (this->ev.key.code == sf::Keyboard::Escape)
-				this->window->close();
+			if (this->ev.key.code == sf::Keyboard::Escape) this->window->close();
 			break;
 		}
 	}
@@ -281,15 +306,31 @@ void Game::updateMousePos()
 
 void Game::updateUi()
 {
-	std::stringstream ss;
-	ss << "Highscore: " << this->highscore << "\n"
-		<< "Points: " << this->points << "\n"
-		<< "Health: " << this->health;
-	this->uiText.setString(ss.str());
+	if (this->points > this->highscore) this->highscore = this->points;
+	std::stringstream scoreString;
+	scoreString << "Highscore: " << this->highscore << "\n"
+		<< "Points: " << this->points << "\n";
+	this->scoreText.setString(scoreString.str());
+
+	//Health
 	if (this->health < 2000) this->healthBar.setSize(sf::Vector2f(200.f * this->health / 1000, 20.f));
 	else this->healthBar.setSize(sf::Vector2f(200.f, 20.f));
-	//If you miss an enemy stamina bar gets smaller. It is changed in updateEnemies because its simpler.
+	
+	std::stringstream healthString;
+	healthString << "Health: " << this->health;
+	this->healthText.setString(healthString.str());
+
+
+
+	//Stamina
 	float curStamina = this->staminaBar.getSize().x;
+	std::stringstream staminaString;
+	staminaString << "Stamina: " << curStamina;
+	this->staminaText.setString(staminaString.str());
+
+
+	//If you miss an enemy stamina bar gets smaller. It is changed in updateEnemies because its simpler.
+
 	if (curStamina < 199.f && !isStaminaRegen)
 	{
 		this->regenClock.restart();
@@ -326,7 +367,7 @@ void Game::deleteEnemy()
 			{
 				//Check if you hit enemy and that there's enough stamina
 				if (this->enemies[i].getGlobalBounds().contains(this->mousePosView) &&
-					(staminaBar.getSize().x > 1.f || 
+					(staminaBar.getSize().x > 1.f ||
 						(this->enemies[i].getPosition().y + this->enemies[i].getSize().y >= this->window->getSize().y - (25 + 30 * this->enemies[i].getVelocity()))))
 				{
 					//Getting points based on difficulty of enemy
@@ -376,65 +417,81 @@ void Game::deleteEnemy()
 	else this->mouseHeld = false;
 }
 
-void Game::moveEnemies()
+
+void Game::updateEnemies()
 {
-	//Check if theres room for more enemies
+	// Check if there's room for more enemies and spawn if necessary
 	if (this->enemies.size() < static_cast<size_t>(this->maxEnemies))
 	{
-		//Check if it is time to spawn enemy, otherwise increase time
 		if (this->enemySpawnTimer >= this->enemySpawnTimerMax)
 		{
-			if (this->difficulty == 4)
-			{
-				for (int i = 0; i < 10; i++) this->spawnEnemy();
-			}
 			this->spawnEnemy();
 			this->enemySpawnTimer = 0.f;
 		}
 		else
+		{
 			this->enemySpawnTimer += 1.f;
+		}
 	}
+
 	// Moving and updating enemies
 	for (size_t i = 0; i < this->enemies.size(); i++)
 	{
-		float enemyX = this->enemies[i].getPosition().x;
-		float enemyY = this->enemies[i].getPosition().y;
-		if (enemyY + this->enemies[i].getSize().y >= this->window->getSize().y- (25 + 25 * this->enemies[i].getVelocity()+this->enemies[i].getOffset()/13))
-		{
-			isTouching = true;
-			float floatXdir = (rand() % 2 == 0) ? 0.1f : -0.1f;
-			this->enemies[i].move(floatXdir,0.f);
-			if (static_cast<int>(rand() % 10 == 0))
-				this->health -= 1;
-		}
-		else
-		{
-			//
-			float angle;
-			float waveX;
-			if (this->enemies[i].getVelocity() % 2 == 0)
-			{
-				angle = enemyY / 100.0f + this->enemies[i].getOffset();
-				waveX = (sin(sin(angle)) * static_cast<float>(pow(cos(angle), 4)) + sin(2 * angle)) * this->speedX * 0.1f;
-			}
-			else
-			{
-				angle = enemyY / 110.0f + this->enemies[i].getOffset();
-				waveX = (sin(angle) * static_cast<float>(pow(cos(angle), 3)) + sin(4 * angle)) * this->speedX * 0.1f;
-			}
-			this->enemies[i].move(waveX + (2 * (rand() % 2) - 1) * 0.2f, speedY);
-		}
-		if (this->enemies[i].getPosition().x + this->enemies[i].getSize().x >= this->window->getSize().x)
-			this->enemies[i].move(-1.0f , 0);
-		//this->enemies[i].move(static_cast<float>(1920) * float(-1.0) + this->enemies[i].getSize().x + float(1), 0);
-		else if (this->enemies[i].getPosition().x < 0)
-		{
-			this->enemies[i].move(1.0f, 0);
-		}
-
+		updateEnemyPosition(this->enemies[i]);
+		checkEnemyBounds(this->enemies[i]);
 	}
+
 	this->isTouching = false;
 }
+
+void Game::updateEnemyPosition(Enemy& enemy)
+{
+	float enemyX = enemy.getPosition().x;
+	float enemyY = enemy.getPosition().y;
+
+	if (enemyY + enemy.getSize().y >= this->window->getSize().y - this->heightRatio * (60 + 30 * enemy.getVelocity() + enemy.getOffset() / 13))
+	{
+		this->isTouching = true;
+		if (static_cast<int>(rand() % 10) == 0)
+		{
+			this->health -= 1;
+		}
+	}
+	else
+	{
+		float waveX = calculateWaveX(enemyY, enemy.getVelocity(), enemy.getOffset());
+		enemy.move(waveX + (2 * (rand() % 2) - 1) * 0.2f, this->speedY);
+	}
+}
+
+float Game::calculateWaveX(float enemyY, int velocity, int offset) const
+{
+	float angle;
+	float randomness = static_cast<float>(rand() % 100) / 100;
+	if (velocity % 2 == 0)
+	{
+		angle = (enemyY / 100.0f + offset) * 0.1f;
+		return (sin(sin(angle) * static_cast<float>(pow(cos(angle), 4)) + sin(0.5f * angle) * this->speedX * 0.1f) * sin(angle) * randomness) * this->widthRatio;
+	}
+	else
+	{
+		angle = (enemyY / 110.0f + offset) * 0.1f;
+		return (sin(angle * static_cast<float>(pow(cos(angle), 3)) + sin(angle) * this->speedX) * cos(angle) * randomness) * this->widthRatio;
+	}
+}
+
+void Game::checkEnemyBounds(Enemy& enemy)
+{
+	if (enemy.getPosition().x + enemy.getSize().x >= this->window->getSize().x)
+	{
+		enemy.move(-1.0f, 0);
+	}
+	else if (enemy.getPosition().x < 0)
+	{
+		enemy.move(1.0f, 0);
+	}
+}
+
 
 void Game::moveHand()
 {
@@ -451,11 +508,6 @@ void Game::update()
 	this->pollEvents();
 
 	//Update mouse pos
-	/*this->mousePos = sf::Mouse::getPosition(*this->window);
-	std::cout << "Mouse pos: "
-		<< mousePos.x << " "
-		<< mousePos.y << "\n";
-	*/
 	if (!this->endGame)
 	{
 		this->updateMousePos();
@@ -464,7 +516,7 @@ void Game::update()
 
 		this->updateSpeed();
 
-		this->moveEnemies();
+		this->updateEnemies();
 
 		this->moveHand();
 
@@ -497,9 +549,13 @@ void Game::renderBlood(sf::RenderTarget& target)
 
 void Game::renderUi(sf::RenderTarget& target)
 {
-	target.draw(this->uiText);
+	target.draw(this->scoreText);
 	target.draw(this->healthBar);
 	target.draw(this->staminaBar);
+	target.draw(this->healthOutline);
+	target.draw(this->staminaOutline);
+	target.draw(this->healthText);
+	target.draw(this->staminaText);
 }
 
 

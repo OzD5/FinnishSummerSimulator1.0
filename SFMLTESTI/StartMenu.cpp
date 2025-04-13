@@ -2,8 +2,8 @@
 
 void StartMenu::initWindow()
 {
-	this->videoMode.height = 1080;
-	this->videoMode.width = 1080;
+	this->videoMode.height = this->windowHeight;
+	this->videoMode.width = this->windowWidth;
 
 	//Dynamically creating new window.
 	this->startwindow = std::make_unique<sf::RenderWindow>(this->videoMode, "Finnish Summer Simulator", sf::Style::Titlebar | sf::Style::Close);
@@ -24,64 +24,50 @@ void StartMenu::initUI()
 {
 
 	//BACKGROUND
-	if (!this->backGroundFile.loadFromFile("Data/Graphics/MainMenuBG.png"))
+	if (!loadRecources())
 	{
-		std::cout << "STARTMENU::INITUI::BACKGROUND NOT LOADED";
-	}
-	if (!this->uiBoxFile.loadFromFile("Data/Graphics/MainMenuBox.png"))
-	{
-		std::cout << "STARTMENU::INITUI::MENUBOX NOT LOADED";
-	}
-	if (!this->font.loadFromFile("Data/Fonts/UI_font.ttf"))
-	{
-		std::cout << "STARTMENU::INITUI::FONT NOT LOADED";
+		std::cerr << "STARTMENU::INITUNI::RECOURCES NOT LOADED" << std::endl;
 	}
 
 	this->backGround.setTexture(this->backGroundFile);
 	this->backGround.setPosition(0, 0);
+	this->backGround.setScale(sf::Vector2f(this->windowWidth / 1920.f, this->windowHeight / 1080.f));
 
-	this->startButton.setTexture(this->uiBoxFile);
-	this->startButton.setScale(sf::Vector2f(1.75f, 1.75f));
-	this->startButton.setPosition(sf::Vector2f(325.f, 550.f));
-	this->startButton.setColor(sf::Color(255, 255, 255, 200));
+	setupButton(startButton, static_cast<float>(this->windowWidth / 2), static_cast<float>(this->windowHeight / 2));
+	setupButton(difficultyButton, static_cast<float>(this->windowWidth / 2), this->startButton.getPosition().y + 100.f);
+	setupButton(exitButton, static_cast<float>(this->windowWidth / 2), this->difficultyButton.getPosition().y + 100.f);
 
-	this->difficultyButton.setTexture(this->uiBoxFile);
-	this->difficultyButton.setScale(sf::Vector2f(1.75f, 1.75f));
-	this->difficultyButton.setPosition(sf::Vector2f(325.f, 650.f));
-	this->difficultyButton.setColor(sf::Color(255, 255, 255, 200));
+	setupText(this->startText, "Begin journey", startButton.getPosition().x, startButton.getPosition().y);
+	setupText(this->difficultyText, "Easy", difficultyButton.getPosition().x, difficultyButton.getPosition().y);
+	setupText(this->exitText, "Exit game", exitButton.getPosition().x, exitButton.getPosition().y);
 
-	this->exitButton.setTexture(this->uiBoxFile);
-	this->exitButton.setScale(sf::Vector2f(1.75f, 1.75f));
-	this->exitButton.setPosition(sf::Vector2f(325.f, 750.f));
-	this->exitButton.setColor(sf::Color(255, 255, 255, 200));
 
-	//TEXT
-	if (!this->font.loadFromFile("Data/Fonts/UI_font.ttf"))
-	{
-		std::cout << "STARTMENU::INITUI::FONT NOT LOADED";
-	}
-
-	this->startText.setFont(this->font);
-	this->startText.setCharacterSize(45);
-	this->startText.setFillColor(sf::Color::White);
-	this->startText.setOutlineColor(sf::Color::Black);
-	this->startText.setString("Begin journey");
-	this->startText.setPosition(sf::Vector2f(350.f, this->startButton.getPosition().y+12.f));
-
-	this->difficultyText.setFont(this->font);
-	this->difficultyText.setCharacterSize(45);
-	this->difficultyText.setFillColor(sf::Color::White);
-	this->difficultyText.setOutlineColor(sf::Color::Black);
-	this->difficultyText.setString("Easy");
-	this->difficultyText.setPosition(sf::Vector2f(470.f, this->difficultyButton.getPosition().y+12.f));
-
-	this->exitText.setFont(this->font);
-	this->exitText.setCharacterSize(45);
-	this->exitText.setFillColor(sf::Color::White);
-	this->exitText.setOutlineColor(sf::Color::Black);
-	this->exitText.setString("Exit game");
-	this->exitText.setPosition(sf::Vector2f(420.f, this->exitButton.getPosition().y+12.f));
 }
+
+const bool StartMenu::loadRecources()
+{
+	return backGroundFile.loadFromFile("Data/Graphics/MainMenuBG.jpg")
+		&& uiBoxFile.loadFromFile("Data/Graphics/MainMenuBox.png")
+		&& font.loadFromFile("Data/Fonts/UI_font.ttf");
+}
+void StartMenu::setupButton(sf::Sprite& button, float x, float y) const
+{
+	button.setTexture(uiBoxFile);
+	button.setScale(sf::Vector2f(1.75f, 1.75f));
+	button.setPosition(sf::Vector2f(x - button.getGlobalBounds().width / 2, y));
+	button.setColor(sf::Color(255, 255, 255, 200));
+}
+
+void StartMenu::setupText(sf::Text& buttonText, const std::string& text, float x, float y) const
+{
+	buttonText.setFont(font);
+	buttonText.setCharacterSize(45);
+	buttonText.setFillColor(sf::Color::White);
+	buttonText.setOutlineColor(sf::Color::Black);
+	buttonText.setString(text);
+	buttonText.setPosition(sf::Vector2f(x + this->exitButton.getGlobalBounds().width/2 - buttonText.getGlobalBounds().width/2, y + 12.f));
+}
+
 
 void StartMenu::initSound()
 {
@@ -109,53 +95,53 @@ void StartMenu::pollEvents()
 				this->leftClickPress = true;
 			}
 		}*/
-}
 	}
+}
 
 
 void StartMenu::checkPress()
 {
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
-		if (this->mouseHold)
-			return;
-		this->mouseHold = true;
-		if (this->startButton.getGlobalBounds().contains(this->mousePosView))
-		{
-			this->endMenu = true;
-			this->startGame = true;
-		}
-		else if (this->difficultyButton.getGlobalBounds().contains(this->mousePosView))
-		{
-			if (this->difficulty >= 4)
-				this->difficulty = 1;
-			else
-				this->difficulty++;
-			switch (difficulty)
-			{
-			case 1:
-				this->difficultyText.setString("Easy");
-				this->difficultyText.move(sf::Vector2f(100.f, 0));
-				break;
-			case 2:
-				this->difficultyText.setString("Medium");
-				this->difficultyText.move(sf::Vector2f(-10.f, 0));
-				break;
-			case 3:
-				this->difficultyText.setString("Hard");
-				this->difficultyText.move(sf::Vector2f(30.f, 0));
-				break;
-			case 4:
-				this->difficultyText.setString("Suomalainen");
-				this->difficultyText.move(sf::Vector2f(-120.f, 0));
-			}
-		}
-		else if (this->exitButton.getGlobalBounds().contains(this->mousePosView))
-		{
-			this->endMenu = true;
-		}
+		this->mouseHold = false;
+		return;
 	}
-	else this->mouseHold = false;
+	if (this->mouseHold)
+		return;
+	this->mouseHold = true;
+	if (this->startButton.getGlobalBounds().contains(this->mousePosView))
+	{
+		this->endMenu = true;
+		this->startGame = true;
+	}
+	else if (this->difficultyButton.getGlobalBounds().contains(this->mousePosView))
+	{
+		if (this->difficulty >= 4)
+			this->difficulty = 1;
+		else
+			this->difficulty++;
+		switch (difficulty)
+		{
+		case 1:
+			this->difficultyText.setString("Easy");
+			break;
+		case 2:
+			this->difficultyText.setString("Medium");
+			break;
+		case 3:
+			this->difficultyText.setString("Hard");
+			break;
+		case 4:
+			this->difficultyText.setString("Suomalainen");
+		}
+		this->difficultyText.setPosition(sf::Vector2f(
+			difficultyButton.getPosition().x + this->exitButton.getGlobalBounds().width / 2 - difficultyText.getGlobalBounds().width / 2
+			, difficultyButton.getPosition().y + 12.f));
+	}
+	else if (this->exitButton.getGlobalBounds().contains(this->mousePosView))
+	{
+		this->endMenu = true;
+	}
 }
 
 void StartMenu::updateMousePos()
@@ -191,6 +177,12 @@ void StartMenu::render()
 	this->startwindow->draw(this->backGround);
 
 	this->renderButtons(*this->startwindow);
+	/* Line to show middle
+	sf::RectangleShape half;
+	half.setSize(sf::Vector2f(5.f, 100.f));
+	half.setPosition(this->windowWidth / 2, windowHeight / 2);
+	half.setFillColor(sf::Color::Green);
+	this->startwindow->draw(half);*/
 
 	this->startwindow->display();
 }
@@ -218,8 +210,10 @@ const bool StartMenu::running() const
 	return false;
 }
 
-StartMenu::StartMenu()
+StartMenu::StartMenu(unsigned width, unsigned height)
 {
+	this->windowWidth = width;
+	this->windowHeight = height;
 	this->initVariables();
 	this->initWindow();
 	this->initUI();
