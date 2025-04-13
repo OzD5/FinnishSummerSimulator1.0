@@ -113,6 +113,7 @@ private:
 	void updateUi();
 	void updateSpeed();
 	void deleteEnemy();
+	const bool mosquitoOnHand(const Enemy& enemy) const;
 	void updateEnemies();
 	void updateEnemyPosition(Enemy& enemy);
 	float calculateWaveX(float enemyY, int velocity, int offset) const; 

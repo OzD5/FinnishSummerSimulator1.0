@@ -356,65 +356,73 @@ void Game::updateSpeed()
 
 void Game::deleteEnemy()
 {
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
-		if (!this->mouseHeld)
-		{
-			this->mouseHeld = true;
-			bool deleted = false;
-			bool hitSkin = false;
-			for (size_t i = 0; i < this->enemies.size() && deleted == false; i++)
-			{
-				//Check if you hit enemy and that there's enough stamina
-				if (this->enemies[i].getGlobalBounds().contains(this->mousePosView) &&
-					(staminaBar.getSize().x > 1.f ||
-						(this->enemies[i].getPosition().y + this->enemies[i].getSize().y >= this->window->getSize().y - (25 + 30 * this->enemies[i].getVelocity()))))
-				{
-					//Getting points based on difficulty of enemy
-					if (this->enemies[i].getVelocity() > 5)
-						this->points += 20;
-					else if (this->enemies[i].getVelocity() > 3)
-						this->points += 15;
-					else if (this->enemies[i].getVelocity() > 1)
-						this->points += 10;
-					else this->points += 5;
-
-					//delete enemy and break loop so that we dont iterate over empty vector lmao
-					if (this->enemies[i].getPosition().y + this->enemies[i].getSize().y >= this->window->getSize().y - (25 + 25 * this->enemies[i].getVelocity() + this->enemies[i].getOffset() / 13)) hitSkin = true;
-					deleted = true;
-					this->enemies.erase(this->enemies.begin() + i);
-				}
-			}
-			if (!deleted || hitSkin)
-			{
-				//Staminabar updates if we have stamina and health decreases when we miss
-				if (staminaBar.getSize().x > 0 && hitSkin)
-				{
-					this->health -= 10;
-					this->isMiss = true;
-					this->bloodClock.restart();
-					//this->staminaBar.setSize(sf::Vector2f(staminaBar.getSize().x - 25.f, 20.f));
-
-					this->hittingHandSound.play();
-				}
-				else if (staminaBar.getSize().x > 0 && !hitSkin)
-				{
-					this->isStaminaRegen = false;
-					this->isMiss = true;
-					this->staminaBar.setSize(sf::Vector2f(staminaBar.getSize().x - 25.f, 20.f));
-
-					if (this->hairyHand.getGlobalBounds().contains(this->mousePosView))
-						this->hittingHandSound.play();
-					else
-						this->swingingAirSound.play();
-				}
-
-			}
-			else
-				this->hittingInsectSound.play();
-		}
+		this->mouseHeld = false;
+		return;
 	}
-	else this->mouseHeld = false;
+	if (this->mouseHeld)
+	{
+		return;
+	}
+	this->mouseHeld = true;
+	bool deleted = false;
+	bool hitSkin = false;
+	for (size_t i = 0; i < this->enemies.size() && deleted == false; i++)
+	{
+		//Check if you hit enemy and that there's enough stamina
+		bool enemyOnHand = mosquitoOnHand(enemies[i]);
+
+		if (!this->enemies[i].getGlobalBounds().contains(this->mousePosView) || 
+			!(staminaBar.getSize().x > 1.f || enemyOnHand))
+			continue;
+
+		//Getting points based on difficulty of enemy
+		int scoreAmount = this->enemies[i].getVelocity();
+		if (!enemyOnHand)
+		{
+			this->points += static_cast<int>(2.5 * scoreAmount) + 5;
+		}
+		else
+		{
+			this->points += 1;
+			hitSkin = true;
+		}
+		//delete enemy and break loop so that we dont iterate over empty vector lmao
+		deleted = true;
+		this->enemies.erase(this->enemies.begin() + i);
+		break;
+	}
+	if (deleted && !hitSkin)
+	{
+		this->hittingInsectSound.play();
+		return;
+	}
+	//Staminabar updates if we have stamina and health decreases when we miss
+	if (staminaBar.getSize().x > 0 && hitSkin)
+	{
+		this->health -= 10;
+		this->isMiss = true;
+		this->bloodClock.restart();
+
+		this->hittingHandSound.play();
+	}
+	else if (staminaBar.getSize().x > 0 && !hitSkin)
+	{
+		this->isStaminaRegen = false;
+		this->isMiss = true;
+		this->staminaBar.setSize(sf::Vector2f(staminaBar.getSize().x - 25.f, 20.f));
+
+		if (this->hairyHand.getGlobalBounds().contains(this->mousePosView))
+			this->hittingHandSound.play();
+		else
+			this->swingingAirSound.play();
+	}
+}
+
+const bool Game::mosquitoOnHand(const Enemy& enemy) const
+{
+	return enemy.getPosition().y + enemy.getSize().y >= this->window->getSize().y - this->heightRatio * (60 + 30 * enemy.getVelocity() + enemy.getOffset() / 13);
 }
 
 
@@ -449,7 +457,7 @@ void Game::updateEnemyPosition(Enemy& enemy)
 	float enemyX = enemy.getPosition().x;
 	float enemyY = enemy.getPosition().y;
 
-	if (enemyY + enemy.getSize().y >= this->window->getSize().y - this->heightRatio * (60 + 30 * enemy.getVelocity() + enemy.getOffset() / 13))
+	if (mosquitoOnHand(enemy))
 	{
 		this->isTouching = true;
 		if (static_cast<int>(rand() % 10) == 0)
