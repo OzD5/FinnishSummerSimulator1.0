@@ -1,240 +1,38 @@
 #include "Game.h"
+#include "GameInitializer.h"
 #include "Save.h"
 #include "Enemy.h"
 #include <iostream>
 
 //Private funktiot
-void Game::initVariables()
-{
-	this->window = nullptr;
-	this->widthRatio = this->windowWidth / 1920.f;
-	this->heightRatio = this->windowHeight / 1080.f;
-	//Game logic
-	this->endGame = false;
-	this->highscore = Save::getHighscore();
-	this->points = 0;
-	this->enemySpawnTimerMax = 200.f;
-	if (this->difficulty == 4)
-	{
-		this->enemySpawnTimer = 1.f;
-		this->enemySpawnTimerMax = 1.f;
-		this->maxEnemies = 1000;
-		this->health = 10000000;
-	}
-	else
-	{
-		this->enemySpawnTimer = this->enemySpawnTimerMax;
-		this->maxEnemies = 7 * this->difficulty;
-		this->health = 1100 - 100 * this->difficulty;
-	}
-	/*
-	this->enemySpawnTimerMax = 0.1f;
-	this->enemySpawnTimer = this->enemySpawnTimerMax;
-	this->maxEnemies = 10000000000 * this->difficulty;
-	this->health = 10000000000;
-	*/
-	this->mouseHeld = false;
-	this->isTouching = false;
-	this->isMiss = false;
-	this->isStaminaRegen = false;
-	this->speedX = 5.f;
-	this->speedY = 1.f * this->difficulty;
-	this->mltplr = 1;
-}
-
-void Game::initWindow()
-{
-	this->videoMode.height = this->windowHeight;
-	this->videoMode.width = this->windowWidth;
-
-	this->window = new sf::RenderWindow(this->videoMode, "Finnish Summer Simulator", sf::Style::Titlebar | sf::Style::Close);
-	this->window->setFramerateLimit(240);
-
-}
-
-void Game::initFonts()
-{
-	if (!this->font.loadFromFile("Data/Fonts/UI_font.ttf"))
-	{
-		std::cout << "GAME::INITFONTS::FONT NOT LOADED";
-	}
-
-}
-
-void Game::initUi()
-{
-	//Scores etc. in uitext
-	this->scoreText.setFont(this->font);
-	this->scoreText.setCharacterSize(48);
-	this->scoreText.setFillColor(sf::Color::White);
-	this->scoreText.setOutlineColor(sf::Color::Black);
-	this->scoreText.setOutlineThickness(0.5);
-	this->scoreText.setString("NONE");
-	this->scoreText.setScale(this->widthRatio, this->heightRatio);
-
-	//Healthbar, Stamina Bar and their outlines
-
-	initBar(healthBar, 20.f, 950.f, sf::Color::Green);
-	initBar(staminaBar, 20.f, 900.f, sf::Color::Blue);
-
-	initOutline(this->healthOutline, 20.f, 950.f);
-	initOutline(this->staminaOutline, 20.f, 900.f);
-
-	initText(scoreText, "NONE", 48, 5.f*this->widthRatio, 10.f*this->heightRatio);
-	initText(this->healthText, "Health: ", 15,
-		this->healthBar.getPosition().x + this->healthBar.getGlobalBounds().width + 20.f,
-		this->healthBar.getPosition().y);
-	initText(this->staminaText, "Stamina: ", 15,
-		this->staminaBar.getPosition().x + this->staminaBar.getGlobalBounds().width + 20.f,
-		this->staminaBar.getPosition().y);
-}
-
-void Game::initText(sf::Text& textObj, std::string text, int size, float x, float y) const
-{
-	textObj.setFont(this->font);
-	textObj.setCharacterSize(size);
-	textObj.setFillColor(sf::Color::White);
-	textObj.setOutlineColor(sf::Color::Black);
-	textObj.setOutlineThickness(0.5);
-	textObj.setString(text);
-	textObj.setPosition(x, y);
-	textObj.setScale(this->widthRatio, this->heightRatio);
-
-}
-
-void Game::initBar(sf::RectangleShape& bar, float x, float y, sf::Color color) const
-{
-	bar.setSize(sf::Vector2f(200.f, 20.f));
-	bar.setPosition(sf::Vector2f(this->widthRatio * x, this->heightRatio * y));
-	bar.setFillColor(color);
-	bar.setScale(this->widthRatio * 1.5f, this->heightRatio);
-}
-
-void Game::initOutline(sf::RectangleShape& outline, float x, float y) const
-{
-	outline.setSize(sf::Vector2f(200.f, 20.f));
-	outline.setPosition(sf::Vector2f(this->widthRatio * x, this->heightRatio * y));
-	outline.setFillColor(sf::Color(0, 0, 0, 0));
-	outline.setOutlineColor(sf::Color::Black);
-	outline.setOutlineThickness(-1.f);
-	outline.setScale(this->widthRatio * 1.5f, this->heightRatio);
-}
-
-void Game::initGraphics()
-{
-	if (!(this->bloodBath).loadFromFile("Data/Graphics/BloodBath.png"))
-	{
-		std::cout << "GAME::INITGRAPHICS::BLOODBATH.PNG NOT FOUND";
-	}
-	else
-	{
-		this->bloodBathObj.setTexture(bloodBath);
-		this->bloodBathObj.setScale(2.0f * this->widthRatio, 2.0f * this->heightRatio);
-	}
-	if (!(this->backGround).loadFromFile("Data/Graphics/GameBG.png"))
-	{
-		std::cout << "GAME::INITGRAPHICS::Background.jpg NOT FOUND";
-	}
-	else
-	{
-		this->backGroundObj.setTexture(backGround);
-		this->backGroundObj.setScale(1.3f * this->widthRatio, 1.1f * this->heightRatio);
-		this->backGroundObj.setPosition(0, 0);
-	}
-	//Jos haluut brainrot V:n niin enemy1 ja enemy.png
-	if (!this->mosquitoL.loadFromFile("Data/Graphics/mosquitoL.png"))
-	{
-		std::cout << "ENEMY::INITGRAPHICS::MOSQUITOL.PNG NOT FOUND";
-	}
-	if (!this->mosquitoR.loadFromFile("Data/Graphics/mosquitoR.png"))
-	{
-		std::cout << "ENEMY::INITGRAPHICS::MOSQUITOR.PNG NOT FOUND";
-	}
-}
-void Game::initSounds()
-{
-	//Initting music
-	std::string musicFile;
-	switch (this->difficulty)
-	{
-	case 1:
-		musicFile = "Data/Sounds/mainOST1.ogg";
-		break;
-	case 2:
-		musicFile = "Data/Sounds/mainOST2.wav";
-		break;
-	case 3:
-		musicFile = "Data/Sounds/mainOST2.2.wav";
-		break;
-	case 4:
-		musicFile = "Data/Sounds/mainOST2.wav";
-		break;
-	default:
-		musicFile = "Data/Sounds/mainOST2.wav";
-		break;
-	}
-
-	if (!(this->musicOST).openFromFile(musicFile))
-	{
-		std::cout << "GAME::INITMUSIC::MAINOST1.OGG NOT FOUND";
-	}
-	this->musicOST.setLoop(true);
-	this->musicOST.setVolume(20);
-	this->musicOST.play();
-
-	//Initting sound FX
-	if (!(this->hittingHandFile).loadFromFile("Data/Sounds/HittingHand.ogg"))
-	{
-		std::cout << "GAME::INITMUSIC::HITTINGHAND.OGG NOT FOUND";
-	}
-	this->hittingHandSound.setBuffer(this->hittingHandFile);
-
-	if (!(this->swingingAirFile).loadFromFile("Data/Sounds/SwingingAir.ogg"))
-	{
-		std::cout << "GAME::INITMUSIC::SWINGINGAIR.OGG NOT FOUND";
-	}
-	this->swingingAirSound.setBuffer(this->swingingAirFile);
-
-	if (!(this->hittingInsectFile).loadFromFile("Data/Sounds/hittingInsect.ogg"))
-	{
-		std::cout << "GAME::INITMUSIC::HITTINGINSECT.OGG NOT FOUND";
-	}
-	this->hittingInsectSound.setBuffer(this->hittingInsectFile);
-	this->hittingInsectSound.setVolume(50);
-
-
-}
-void Game::initHand()
-{
-	//Hand object
-	if (!this->handTexture.loadFromFile("Data/Graphics/HairyArm.png"))
-	{
-		std::cout << "ENEMY::INITGRAPHICS::HAIRYARM.PNG NOT FOUND";
-	}
-	this->hairyHand.setTexture(this->handTexture);
-	this->hairyHand.setScale(sf::Vector2f(2.1f * this->widthRatio, 0.9f * this->heightRatio));
-	this->hairyHand.setPosition(-10.f, 0.6f * this->windowHeight);
-}
 
 //Constructori/Destructori
-Game::Game(short difficulty, unsigned windowWidth, unsigned windowHeight)
+Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN)
+	: difficulty(difficultyIN)
+	, windowWidth(windowWidthIN)
+	, windowHeight(windowHeightIN)
+	, heightRatio(0.0f)
+	, widthRatio(0.0f)
+	, endGame(false)
+	, highscore(0)
+	, points(0)
+	, enemySpawnTimer(0.0f)
+	, enemySpawnTimerMax(0.0f)
+	, maxEnemies(0)
+	, health(0)
+	, mouseHeld(false)
+	, isTouching(false)
+	, isMiss(false)
+	, isStaminaRegen(false)
+	, speedX(0.0f)
+	, speedY(0.0f)
+	, mltplr(0)
 {
-	this->difficulty = difficulty;
-	this->windowWidth = windowWidth;
-	this->windowHeight = windowHeight;
-	this->initVariables();
-	this->initWindow();
-	this->initHand();
-	this->initFonts();
-	this->initUi();
-	this->initGraphics();
-	this->initSounds();
+	GameInitializer::init(*this);
 }
-
 Game::~Game()
 {
 	Save::updateHighscore(this->points);
-	delete this->window;
 }
 
 //Always check if game is running

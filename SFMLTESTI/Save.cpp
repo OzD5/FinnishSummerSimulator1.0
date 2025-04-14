@@ -8,9 +8,10 @@ unsigned int Save::getHighscore()
 {
 	std::ifstream inputFile(fileName);
 	std::string line;
-	if (inputFile.is_open())
+	if (!inputFile.is_open())
 	{
-		std::cerr << "Unable to open file 1: " << fileName << std::endl;
+		std::cerr << "Unable to open SAVE.TXT: " << fileName << std::endl;
+		return 0;
 	}
 	while (std::getline(inputFile, line)) {
 		if (!(line == "highscore")) continue;
@@ -19,8 +20,8 @@ unsigned int Save::getHighscore()
 			try {
 				highscore = std::stoi(line);
 			}
-			catch (const std::invalid_argument&) { highscore = 69; }
-			catch (const std::out_of_range&) { highscore = 69; }
+			catch (const std::invalid_argument&) { highscore = 0; }
+			catch (const std::out_of_range&) { highscore = 0; }
 		}
 		break;
 	}
@@ -31,32 +32,35 @@ unsigned int Save::getHighscore()
 
 void Save::updateHighscore(unsigned int newHighScore)
 {
-	if (newHighScore > highscore)
+	if (newHighScore <= highscore) 
+		return;
+	//We return because no need to update
+	highscore = newHighScore;
+	std::ifstream inputFile(fileName);
+	std::string line;
+	std::vector<std::string> lines;
+	if (!inputFile.is_open())
+		std::cerr << "Unable to open SAVE.TXT: " << fileName << std::endl;
+	while (std::getline(inputFile, line)) {
+		lines.push_back(line);
+	}
+	inputFile.close();
+	std::ofstream outputFile(fileName);
+	if (!outputFile.is_open())
 	{
-		highscore = newHighScore;
-		std::ifstream inputFile(fileName);
-		std::string line;
-		std::vector<std::string> lines;
-		if (inputFile.is_open())
-			std::cerr << "Unable to open file 1: " << fileName << std::endl;
-		while (std::getline(inputFile, line)) {
-			lines.push_back(line);
+		std::cerr << "Unable to write SAVE.TXT: " << fileName << std::endl;
+		return;
+	}
+	//If outputFile opens and 
+	for (size_t i = 0; i < lines.size(); ++i) {
+		if (lines[i] == "highscore") {
+			// Updating to the score after text highscore
+			outputFile << "highscore" << std::endl;
+			++i;
+			outputFile << highscore;
 		}
-		inputFile.close();
-		std::ofstream outputFile(fileName);
-		if (outputFile.is_open()) {
-			for (size_t i = 0; i < lines.size(); ++i) {
-				if (lines[i] == "highscore") {
-					// Päivitetään oikeaan kohtaan highscore
-					outputFile << "highscore" << std::endl;
-					++i;
-					outputFile << highscore;
-				}
-				else {
-					outputFile << lines[i] << std::endl;
-				}
-			}
+		else {
+			outputFile << lines[i] << std::endl;
 		}
-		else std::cerr << "Unable to write file 1: " << fileName << std::endl;
 	}
 }

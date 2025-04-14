@@ -4,19 +4,23 @@
 #include <ctime>
 #include <sstream>
 #include <algorithm>
+#include <memory>
+
 #include "Enemy.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
+
+class GameInitializer;
 /*
-* "Game enginena" toimiva 
+* "Game engine"
 */
 class Game
 {
 private:
-	sf::RenderWindow* window;
+	std::unique_ptr<sf::RenderWindow> window;
 	sf::Event ev;
 	sf::VideoMode videoMode;
 
@@ -92,18 +96,9 @@ private:
 	sf::Sprite bloodBathObj;
 	sf::Clock bloodClock;
 
+	//Game Initializer can access private variables of Game class
+	friend class GameInitializer;
 
-
-	void initVariables();
-	void initWindow();
-	void initFonts();
-	void initUi();
-	void initText(sf::Text& textObj, std::string text, int size, float x, float y) const;
-	void initBar(sf::RectangleShape& bar, float x, float y, sf::Color color) const;
-	void initOutline(sf::RectangleShape& outline, float x, float y) const;
-	void initGraphics();
-	void initSounds();
-	void initHand();
 
 	//Functions
 	void spawnEnemy();
