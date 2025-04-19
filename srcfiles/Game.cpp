@@ -130,7 +130,7 @@ void Game::deleteEnemy()
 		bool enemyOnHand = mosquitoOnHand(enemies[i]);
 
 		//If we havent hit the enemy we continue. Also if we hit but we dont have stamina and the enemy not in hand we continue
-		if (!this->enemies[i].getGlobalBounds().contains(this->mousePosView) &&
+		if (!this->enemies[i].getGlobalBounds().contains(this->mousePosView) ||
 			!(staminaBar.getSize().x > 1.f || enemyOnHand))
 			continue;
 
@@ -374,8 +374,7 @@ void Game::update()
 		this->deleteEnemy();
 
 	}
-	std::cout << this->enemies.size() << "\n";
-	//health check
+	//Health check
 	if (this->health <= 0)
 	{
 		this->endGame = true;

@@ -24,7 +24,9 @@ private:
 	sf::Font font;
 	sf::Text startText;
 	sf::Text difficultyText;
+	sf::Text resolutionText;
 	sf::Text exitText;
+	
 
 	sf::Texture backGroundFile;
 	sf::Texture uiBoxFile;
@@ -32,19 +34,23 @@ private:
 	sf::Sprite backGround;
 	sf::Sprite startButton;
 	sf::Sprite difficultyButton;
+	sf::Sprite resolutionButton;
 	sf::Sprite exitButton;
 
 	unsigned windowHeight;
 	unsigned windowWidth;
-
+	float windowRatio;
 	bool endMenu;
 	bool mouseHold;
 	bool startGame;
 	short difficulty;
+	short resolution;
 	//music
 	sf::Music mainMenuMusic;
 
 	void checkPress();
+	void updateDifficulty();
+	void updateResolution();
 	void updateMousePos();
 	void initWindow();
 	void initVariables();
@@ -59,6 +65,7 @@ public:
 	void update();
 	void render();
 
+	short getResolution() const;
 	short getDifficulty() const;
 	bool getEndMenu() const;
 	bool getStartGame() const;
