@@ -149,17 +149,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameInitializer.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Save.cpp" />
-    <ClCompile Include="StartMenu.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="GameInitializer.h" />
     <ClInclude Include="libraries\include\SFML\Audio.hpp" />
     <ClInclude Include="libraries\include\SFML\Audio\AlResource.hpp" />
     <ClInclude Include="libraries\include\SFML\Audio\Export.hpp" />
@@ -258,8 +247,6 @@
     <ClInclude Include="libraries\include\SFML\Window\Window.hpp" />
     <ClInclude Include="libraries\include\SFML\Window\WindowHandle.hpp" />
     <ClInclude Include="libraries\include\SFML\Window\WindowStyle.hpp" />
-    <ClInclude Include="Save.h" />
-    <ClInclude Include="StartMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libraries\include\SFML\Audio\SoundFileFactory.inl" />
@@ -271,6 +258,14 @@
     <None Include="libraries\include\SFML\System\Utf.inl" />
     <None Include="libraries\include\SFML\System\Vector2.inl" />
     <None Include="libraries\include\SFML\System\Vector3.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="srcfiles\Enemy.cpp" />
+    <ClCompile Include="srcfiles\Game.cpp" />
+    <ClCompile Include="srcfiles\GameInitializer.cpp" />
+    <ClCompile Include="srcfiles\main.cpp" />
+    <ClCompile Include="srcfiles\Save.cpp" />
+    <ClCompile Include="srcfiles\StartMenu.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

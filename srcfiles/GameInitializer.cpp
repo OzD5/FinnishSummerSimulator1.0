@@ -141,12 +141,12 @@ void GameInitializer::initGraphics(Game& game)
         game.backGroundObj.setScale(1.3f * game.widthRatio, 1.1f * game.heightRatio);
         game.backGroundObj.setPosition(0, 0);
     }
-    //Jos haluut brainrot V:n niin enemy1 ja enemy.png
-    if (game.mosquitoL.loadFromFile("Data/Graphics/mosquitoL.png"))
+    //Mosquito Pictures
+    if (!game.mosquitoL.loadFromFile("Data/Graphics/mosquitoLL.png"))
     {
-        std::cout << "GAMEINITIALIZER::INITGRAPHICS::MOSQUITOL.PNG NOT FOUND";
+        std::cout << "GAMEINITIALIZER::INITGRAPHICS::MOSQUITOLL.PNG NOT FOUND";
     }
-    if (game.mosquitoR.loadFromFile("Data/Graphics/mosquitoR.png"))
+    if (!game.mosquitoR.loadFromFile("Data/Graphics/mosquitoRR.PNG"))
     {
         std::cout << "GAMEINITIALIZER::INITGRAPHICS::MOSQUITOR.PNG NOT FOUND";
     }

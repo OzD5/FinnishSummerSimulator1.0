@@ -5,57 +5,42 @@
 
 int main()
 {
-	//1,2,3 difficulty = easy,medium,hard
+	//1,2,3,4 difficulty = easy,medium,hard, suomalainen
 	short difficulty = 2;
-	unsigned windowWidth = 2560;
-	unsigned windowHeight = 1440 ;
+	unsigned windowWidth = 1920;
+	unsigned windowHeight = 1080;
 	//init rand gen
 	std::srand(static_cast<unsigned>(time(NULL)));
 
-	sf::Clock clock;
-	int frameCount = 0;
-	float fps = 0.0f; 
 
 	// Game object
 	StartMenu* startMenu = new StartMenu(windowWidth, windowHeight);
 	while (startMenu->running() && !startMenu->getEndMenu())
 	{
 		startMenu->update();
-
 		startMenu->render();
 	}
-
-
-	if (!startMenu->getStartGame())
-		return 0;
 	difficulty = startMenu->getDifficulty();
-
+	if (!startMenu->getStartGame())
+	{
+		delete startMenu;
+		return 0;
+	}
 	delete startMenu;
 
 	Game game(difficulty, windowWidth, windowHeight);
 
-	
+
 	//Game loop
 	while (game.running() && !game.getEndGame())
 	{
 
-		//Update
-		frameCount++;
-		sf::Time elapsedTime = clock.getElapsedTime();
-
-		if (elapsedTime.asSeconds() >= 0.1f) {
-			fps = static_cast<float>(frameCount) / elapsedTime.asSeconds();
-			std::cout << "FPS: " << fps << std::endl;
-
-			// Reset for the next second
-			clock.restart();
-			frameCount = 0;
-		}
 		game.update();
 
 		//Render
 		game.render();
 	}
+
 
 
 	return 0;
