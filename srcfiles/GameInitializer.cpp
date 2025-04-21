@@ -25,8 +25,8 @@ void GameInitializer::initVariables(Game& game)
     if (game.difficulty == 4)
     {
         game.enemySpawnTimer = 1.f;
-        game.enemySpawnTimerMax = 1.f;
-        game.maxEnemies = 1000;
+        game.enemySpawnTimerMax = 5.f;
+        game.maxEnemies = 10000;
         game.health = 10000000;
     }
     else

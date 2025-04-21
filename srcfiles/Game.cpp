@@ -263,7 +263,7 @@ void Game::moveHand()
 	if (rand() % 10 == 0)
 	{
 		float shakeX = (rand() % 3 - 1) * 0.25f;
-		float shakeY = (rand() % 3 - 1) * 0.1f;
+		float shakeY = (rand() % 3 - 1) * 0.2f;
 		this->hairyHand.move(sf::Vector2f(shakeX, shakeY));
 	}
 }

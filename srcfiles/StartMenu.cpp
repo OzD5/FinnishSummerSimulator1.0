@@ -81,6 +81,7 @@ void StartMenu::initSound()
 	{
 		std::cout << "STARTMENU::INITSOUND::MAINMENUOST.WAW NOT FOUND";
 	}
+	this->mainMenuMusic.setLoop(true);
 	this->mainMenuMusic.setVolume(14);
 	this->mainMenuMusic.play();
 }
