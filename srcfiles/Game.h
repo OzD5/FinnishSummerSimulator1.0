@@ -20,7 +20,7 @@ class GameInitializer;
 class Game
 {
 private:
-	std::unique_ptr<sf::RenderWindow> window;
+	sf::RenderWindow* window;
 	sf::Event ev;
 	sf::VideoMode videoMode;
 
@@ -120,12 +120,14 @@ private:
 	void renderRects(sf::RenderTarget& target);
 public:
 	//construction / destruction
-	Game(short difficulty, unsigned windowWidth, unsigned windowHeight);
+	Game(short difficulty, unsigned windowWidth, unsigned windowHeight, sf::RenderWindow* window);
 	virtual ~Game();
 
 	//Accessors
 	const bool running() const;
 	const bool getEndGame() const;
+	void updateHighScore() const;
+	void silenceMusic();
 
 	void update();
 	void render();

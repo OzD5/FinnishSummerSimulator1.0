@@ -42,7 +42,7 @@ void Game::pollEvents()
 			break;
 
 		case sf::Event::KeyPressed:
-			if (this->ev.key.code == sf::Keyboard::Escape) this->window->close();
+			if (this->ev.key.code == sf::Keyboard::Escape) this->endGame = true;
 			break;
 		}
 	}
@@ -308,7 +308,7 @@ void Game::renderRects(sf::RenderTarget& target)
 }
 
 //Constructor/Destructor
-Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN)
+Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN, sf::RenderWindow* window)
 	: difficulty(difficultyIN)
 	, windowWidth(windowWidthIN)
 	, windowHeight(windowHeightIN)
@@ -329,9 +329,10 @@ Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN)
 	, speedY(0.0f)
 	, mltplr(0)
 	, ev()
+	, window(window)
 {
 	//Initting the values of Game variables in Gameinitializer class
-	GameInitializer::init(*this);
+	GameInitializer::init(*this,window);
 }
 
 Game::~Game()
@@ -352,6 +353,16 @@ const bool Game::running() const
 const bool Game::getEndGame() const
 {
 	return this->endGame;
+}
+
+void Game::updateHighScore() const
+{
+	Save::updateHighscore(this->points);
+}
+
+void Game::silenceMusic()
+{
+	this->musicOST.pause();
 }
 
 void Game::update()

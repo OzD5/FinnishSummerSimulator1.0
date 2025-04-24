@@ -1,9 +1,9 @@
 #include "GameInitializer.h"
 
-void GameInitializer::init(Game& game)
+void GameInitializer::init(Game& game, sf::RenderWindow* mainWindow)
 {
     initVariables(game);
-    initWindow(game);
+    initWindow(game, mainWindow);
     initHand(game);
     initFonts(game);
     initUi(game);
@@ -45,12 +45,12 @@ void GameInitializer::initVariables(Game& game)
     game.mltplr = 1;
 }
 
-void GameInitializer::initWindow(Game& game)
+void GameInitializer::initWindow(Game& game, sf::RenderWindow* mainWindow)
 {
     game.videoMode.height = game.windowHeight;
     game.videoMode.width = game.windowWidth;
 
-    game.window = std::make_unique<sf::RenderWindow>(game.videoMode, "Finnish Summer Simulator", sf::Style::Titlebar | sf::Style::Close);
+    game.window = mainWindow;
     game.window->setFramerateLimit(240);
 }
 
@@ -162,16 +162,16 @@ void GameInitializer::initSounds(Game& game)
         musicFile = "Data/Sounds/mainOST1.ogg";
         break;
     case 2:
-        musicFile = "Data/Sounds/mainOST2.wav";
+        musicFile = "Data/Sounds/mainOST1.ogg";
         break;
     case 3:
-        musicFile = "Data/Sounds/mainOST2.2.wav";
+        musicFile = "Data/Sounds/mainOST1.ogg";
         break;
     case 4:
-        musicFile = "Data/Sounds/mainOST2.wav";
+        musicFile = "Data/Sounds/mainOST1.ogg";
         break;
     default:
-        musicFile = "Data/Sounds/mainOST2.wav";
+        musicFile = "Data/Sounds/mainOST1.ogg";
         break;
     }
 

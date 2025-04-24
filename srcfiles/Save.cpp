@@ -7,7 +7,7 @@ const int Save::ENCRYPTIONKEY = 314159265;
 //Very Simple encryption. Won't be THAT easy to change Highscore
 std::string Save::encrypt(const int& highscore)
 {
-	int xorScore = highscore ^ ENCRYPTIONKEY -1000;
+	int xorScore = highscore ^ ENCRYPTIONKEY;
 	std::string xorString = std::to_string(xorScore);
 	std::string encryptedScore = "";
 	for (char& chrNum : xorString)
@@ -29,7 +29,6 @@ const int Save::decrypt(std::string& encryptedString)
 		xorString += chrNum;
 	}
 	int decryptedScore = std::stoi(xorString);
-	decryptedScore += 1000;
 	decryptedScore ^= ENCRYPTIONKEY;
 	return decryptedScore;
 }
@@ -47,15 +46,16 @@ unsigned int Save::getHighscore()
 	while (std::getline(inputFile, line)) {
 		if (!(line == "hs")) continue;
 		// Get highscore from file
-		if (std::getline(inputFile, line)) {
-			try {
-				std::string encryptedScore = line;
-				highscore = Save::decrypt(encryptedScore);
-			}
-			catch (const std::invalid_argument&) { highscore = 0; }
-			catch (const std::out_of_range&) { highscore = 0; }
+		//In case that after "hs", we can't get line
+		if (!std::getline(inputFile, line)) 
+			break;
+
+		try {
+			std::string encryptedScore = line;
+			highscore = Save::decrypt(encryptedScore);
 		}
-		break;
+		catch (const std::invalid_argument&) { highscore = 0; }
+		catch (const std::out_of_range&) { highscore = 0; }
 	}
 
 	inputFile.close();

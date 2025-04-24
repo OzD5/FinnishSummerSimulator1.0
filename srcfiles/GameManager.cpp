@@ -1,9 +1,9 @@
 #include "GameManager.h"
 
-GameManager::GameManager(int windowWidth_in, int windowHeight_in):
+GameManager::GameManager(int windowWidth_in, int windowHeight_in, sf::RenderWindow* window):
 	windowWidth(windowWidth_in), windowHeight(windowHeight_in), difficulty(0)
 {
-	this->runStartMenu(this->windowWidth, this->windowHeight);
+	this->runStartMenu(this->windowWidth, this->windowHeight, window);
 
 }
 
@@ -28,14 +28,16 @@ void GameManager::changeResoluton(short resolution)
 	}
 }
 
-void GameManager::runStartMenu(int windowWidth, int windowHeight)
+void GameManager::runStartMenu(int windowWidth, int windowHeight, sf::RenderWindow* window)
 {
-	StartMenu* startMenu = new StartMenu(windowWidth, windowHeight);
+	//std::unique_ptr<StartMenu> startMenu = std::make_unique<StartMenu>(windowWidth, windowHeight,window);
+	StartMenu* startMenu = new StartMenu(windowWidth, windowHeight, window);
 	while (startMenu->running() && !startMenu->getEndMenu())
 	{
 		startMenu->update();
 		startMenu->render();
 	}
+	startMenu->silenceMusic();
 	//If play button is not pressed we close the app. Otherwise we run the game
 	if (!startMenu->getStartGame())
 	{
@@ -44,18 +46,20 @@ void GameManager::runStartMenu(int windowWidth, int windowHeight)
 	}
 	this->difficulty = startMenu->getDifficulty();
 	short resolution = startMenu->getResolution();
+	//TODO: RESOLUTION CHANGE NOT WORKING
 	changeResoluton(resolution);
-
 	delete startMenu;
 
-	this->runGame(this->difficulty, this->windowWidth, this->windowHeight);
+
+	this->runGame(this->difficulty, this->windowWidth, this->windowHeight, window);
 
 }
 
-void GameManager::runGame(short difficulty, int windowWidth, int windowHeight)
+void GameManager::runGame(short difficulty, int windowWidth, int windowHeight, sf::RenderWindow* window)
 {
-	Game* game = new Game(difficulty, windowWidth, windowHeight);
-
+	//Can't use smartpointers here. They're not so smart afterall
+	//std::unique_ptr<Game> game = std::make_unique<Game>(difficulty, windowWidth, windowHeight, window);
+	Game* game = new Game(difficulty, windowWidth, windowHeight, window);
 
 	//Game loop
 	while (game->running() && !game->getEndGame())
@@ -66,7 +70,9 @@ void GameManager::runGame(short difficulty, int windowWidth, int windowHeight)
 		//Render
 		game->render();
 	}
-	delete game;
+	game->silenceMusic();
+	game->updateHighScore();
 	//After game ends we go back to menu
-	this->runStartMenu(this->windowWidth, this->windowHeight);
+	delete game;
+	this->runStartMenu(this->windowWidth, this->windowHeight, window);
 }

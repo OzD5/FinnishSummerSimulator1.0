@@ -6,11 +6,11 @@
 class GameInitializer
 {
 public:
-    static void init(Game& game);
+    static void init(Game& game, sf::RenderWindow* mainWindow);
 
 private:
     static void initVariables(Game& game);
-    static void initWindow(Game& game);
+    static void initWindow(Game& game, sf::RenderWindow* mainWindow);
     static void initFonts(Game& game);
     static void initUi(Game& game);
     static void initText(Game& game, sf::Text& textObj, std::string text, int size, float x, float y);

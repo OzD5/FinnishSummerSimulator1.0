@@ -9,8 +9,8 @@ private:
 	int windowHeight;
 	short difficulty;
 	void changeResoluton(short resolution);
-	void runStartMenu(int windowWidth, int windowHeight);
-	void runGame(short difficulty, int windowWidth, int windowHeight);
+	void runStartMenu(int windowWidth, int windowHeight, sf::RenderWindow* window);
+	void runGame(short difficulty, int windowWidth, int windowHeight, sf::RenderWindow* window);
 public:
-	explicit GameManager(int windowWidth_in, int windowHeight_in);
+	explicit GameManager(int windowWidth_in, int windowHeight_in, sf::RenderWindow* window);
 };

@@ -13,7 +13,7 @@
 class StartMenu
 {
 private:
-	std::unique_ptr<sf::RenderWindow> startwindow;
+	sf::RenderWindow* startwindow;
 	sf::Event eve;
 	sf::VideoMode videoMode;
 
@@ -52,7 +52,7 @@ private:
 	void updateDifficulty();
 	void updateResolution();
 	void updateMousePos();
-	void initWindow();
+	void initWindow(sf::RenderWindow* window);
 	void initVariables();
 	void initUI();
 	const bool loadRecources();
@@ -64,6 +64,7 @@ private:
 public:
 	void update();
 	void render();
+	void silenceMusic();
 
 	short getResolution() const;
 	short getDifficulty() const;
@@ -71,6 +72,6 @@ public:
 	bool getStartGame() const;
 	const bool running() const;
 
-	StartMenu(unsigned width, unsigned height);
+	StartMenu(unsigned width, unsigned height, sf::RenderWindow* window);
 	virtual ~StartMenu();
 };

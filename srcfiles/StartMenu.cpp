@@ -1,13 +1,13 @@
 #include "StartMenu.h"
 
-void StartMenu::initWindow()
+void StartMenu::initWindow(sf::RenderWindow* window)
 {
 	this->videoMode.height = this->windowHeight;
 	this->videoMode.width = this->windowWidth;
 	this->windowRatio = this->windowWidth / 1920.f;
 
 	//Dynamically creating new window.
-	this->startwindow = std::make_unique<sf::RenderWindow>(this->videoMode, "Finnish Summer Simulator", sf::Style::Titlebar | sf::Style::Close);
+	this->startwindow =window;
 	this->startwindow->setFramerateLimit(60);
 }
 
@@ -39,12 +39,12 @@ void StartMenu::initUI()
 	float centerHeight = static_cast<float>(this->windowHeight / 2);
 	setupButton(startButton, centerWidth, centerHeight);
 	setupButton(difficultyButton, centerWidth, centerHeight + 100.f*windowRatio);
-	setupButton(resolutionButton, centerWidth, centerHeight + 200.f*windowRatio);
-	setupButton(exitButton, centerWidth, centerHeight + 300.f*windowRatio);
+	//setupButton(resolutionButton, centerWidth, centerHeight + 200.f*windowRatio);
+	setupButton(exitButton, centerWidth, centerHeight + 200.f*windowRatio);
 
 	setupText(this->startText, "Begin journey", startButton.getPosition().x, startButton.getPosition().y);
 	setupText(this->difficultyText, "Easy", difficultyButton.getPosition().x, difficultyButton.getPosition().y);
-	setupText(this->resolutionText, "1080p", resolutionButton.getPosition().x, resolutionButton.getPosition().y);
+	//setupText(this->resolutionText, "1080p", resolutionButton.getPosition().x, resolutionButton.getPosition().y);
 	setupText(this->exitText, "Exit game", exitButton.getPosition().x, exitButton.getPosition().y);
 
 
@@ -227,6 +227,11 @@ void StartMenu::render()
 	this->startwindow->display();
 }
 
+void StartMenu::silenceMusic()
+{
+	this->mainMenuMusic.pause();
+}
+
 short StartMenu::getResolution() const
 {
 	return this->resolution;
@@ -255,12 +260,12 @@ const bool StartMenu::running() const
 	return false;
 }
 
-StartMenu::StartMenu(unsigned width, unsigned height)
+StartMenu::StartMenu(unsigned width, unsigned height, sf::RenderWindow* window)
 {
 	this->windowWidth = width;
 	this->windowHeight = height;
 	this->initVariables();
-	this->initWindow();
+	this->initWindow(window);
 	this->initUI();
 	this->initSound();
 }
