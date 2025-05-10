@@ -8,14 +8,14 @@
 void Game::spawnEnemy()
 {
 	// Spawn enemies with random type, and random velocity
-	int type = (rand() % 7) + 1;
+	int type = (rand() % 7);
 
 	//Half of mosquitos look right and half look left
 	sf::Texture* mosquitoPic = (rand() % 2 == 1) ? mosquitoPic = &mosquitoL : &mosquitoR;
 	//Creating new enemy
 	Enemy newEnemy(*mosquitoPic, sf::Vector2f(static_cast<float>(rand() % (static_cast<int>(this->window->getSize().x - 50.f)) + 50.f),
 		0.f), type, (rand() % 100) * 10);
-
+	/*
 	std::map<int, sf::Vector2f> sizeMap = {
 	  {7, sf::Vector2f(55.f, 30.f)},
 	  {6, sf::Vector2f(60.f, 70.f)},
@@ -25,10 +25,21 @@ void Game::spawnEnemy()
 	  {2, sf::Vector2f(70.f, 70.f)},
 	  {1, sf::Vector2f(75.f, 95.f)}
 	};
-	newEnemy.setSize(sf::Vector2f(0.003f * this->heightRatio * sizeMap[type].x, 0.003f * this->heightRatio * sizeMap[type].y));
+ 	*/
+	// Array much more efficient
+	std::array<sf::Vector2f> sizes = {
+	  sf::Vector2f(55.f, 30.f),
+	  sf::Vector2f(60.f, 70.f),
+	  sf::Vector2f(65.f, 30.f),
+	  sf::Vector2f(85.f, 50.f),
+	  sf::Vector2f(45.f, 90.f),
+	  sf::Vector2f(70.f, 70.f),
+	  sf::Vector2f(75.f, 95.f)
+	}
+	newEnemy.setSize(sf::Vector2f(0.003f * this->heightRatio * sizes[type].x, 0.003f * this->heightRatio * sizes[type].y));
 
 	this->enemies.push_back(newEnemy);
-
+	
 }
 
 void Game::pollEvents()
