@@ -1,5 +1,5 @@
 # Mosquito Game
-
+2D-game about surviving the Finnish conditions. Made in C++ with the help of SFML library
 ### How to build v.1.1.0-alpha:
  1. https://github.com/OzD5/FinnishSummerSimulator1.0/releases/tag/v.1.1.0-alpha download the zip file.
  2. Unzip it
