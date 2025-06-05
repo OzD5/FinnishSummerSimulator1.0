@@ -41,7 +41,7 @@ void StartMenu::initUI()
 	setupButton(difficultyButton, centerWidth, centerHeight + 100.f*windowRatio);
 	//setupButton(resolutionButton, centerWidth, centerHeight + 200.f*windowRatio);
 	setupButton(exitButton, centerWidth, centerHeight + 200.f*windowRatio);
-
+	//TODO RESOLUTION CHANGE NOT WORKING PROPERLY
 	setupText(this->startText, "Begin journey", startButton.getPosition().x, startButton.getPosition().y);
 	setupText(this->difficultyText, "Easy", difficultyButton.getPosition().x, difficultyButton.getPosition().y);
 	//setupText(this->resolutionText, "1080p", resolutionButton.getPosition().x, resolutionButton.getPosition().y);
