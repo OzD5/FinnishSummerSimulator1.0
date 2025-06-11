@@ -7,7 +7,7 @@ GameManager::GameManager(int windowWidth_in, int windowHeight_in, sf::RenderWind
 
 }
 
-void GameManager::changeResoluton(short resolution)
+void GameManager::changeResoluton(short resolution, sf::RenderWindow* window)
 {
 	switch (resolution)
 	{
@@ -26,6 +26,9 @@ void GameManager::changeResoluton(short resolution)
 	default:
 		break;
 	}
+	//Fixed changing the window. 
+	delete window;
+	window = new sf::RenderWindow(sf::VideoMode(this->windowWidth, this->windowHeight), "Finnish Summer Simulator", sf::Style::Titlebar | sf::Style::Default);
 }
 
 void GameManager::runStartMenu(int windowWidth, int windowHeight, sf::RenderWindow* window)
@@ -47,7 +50,7 @@ void GameManager::runStartMenu(int windowWidth, int windowHeight, sf::RenderWind
 	this->difficulty = startMenu->getDifficulty();
 	short resolution = startMenu->getResolution();
 	//TODO: RESOLUTION CHANGE NOT WORKING
-	changeResoluton(resolution);
+	changeResoluton(resolution, window);
 	delete startMenu;
 
 
