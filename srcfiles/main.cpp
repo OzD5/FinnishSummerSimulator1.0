@@ -5,7 +5,6 @@
 
 int main()
 {
-	//1,2,3,4 difficulty = easy,medium,hard, suomalainen
 	unsigned windowWidth = 1920;
 	unsigned windowHeight = 1080;
 	sf::RenderWindow* window = new sf::RenderWindow (sf::VideoMode(1920, 1080), "Finnish Summer Simulator",sf::Style::Titlebar | sf::Style::Default);

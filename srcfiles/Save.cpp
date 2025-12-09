@@ -2,12 +2,12 @@
 unsigned int Save::highscore = 0;
 const std::string Save::fileName = "Data/Saves/Save.txt";
 const int Save::ENCRYPTIONKEY = 314159265;
-
+const int Save::SECONDENCRYPTIONKEY = 27182818;
 
 //Very Simple encryption. Won't be THAT easy to change Highscore
-std::string Save::encrypt(const int& highscore)
+std::string Save::encrypt(const int& highscore, const int& encryptionKey)
 {
-	int xorScore = highscore ^ ENCRYPTIONKEY;
+	int xorScore = highscore ^ encryptionKey;
 	std::string xorString = std::to_string(xorScore);
 	std::string encryptedScore = "";
 	for (char& chrNum : xorString)
@@ -19,7 +19,7 @@ std::string Save::encrypt(const int& highscore)
 	return encryptedScore;
 }
 
-const int Save::decrypt(std::string& encryptedString)
+const int Save::decrypt(std::string& encryptedString, const int& encryptionKey)
 {
 	std::string xorString = "";
 	for (char encryptedChr : encryptedString)
@@ -29,7 +29,7 @@ const int Save::decrypt(std::string& encryptedString)
 		xorString += chrNum;
 	}
 	int decryptedScore = std::stoi(xorString);
-	decryptedScore ^= ENCRYPTIONKEY;
+	decryptedScore ^= encryptionKey;
 	return decryptedScore;
 }
 
@@ -43,22 +43,31 @@ unsigned int Save::getHighscore()
 		std::cerr << "Unable to open SAVE.TXT: " << fileName << std::endl;
 		return 0;
 	}
-	while (std::getline(inputFile, line)) {
-		if (!(line == "hs")) continue;
-		// Get highscore from file
-		//In case that after "hs", we can't get line
-		if (!std::getline(inputFile, line)) 
-			break;
 
-		try {
-			std::string encryptedScore = line;
-			highscore = Save::decrypt(encryptedScore);
+	unsigned int checkSum = 0;
+	bool zeroth = false;
+	bool firstScore = false;
+	while (std::getline(inputFile, line)) {
+
+		std::string encryptedScore = line;
+		if (line == "hs") {
+			continue;
 		}
-		catch (const std::invalid_argument&) { highscore = 0; }
-		catch (const std::out_of_range&) { highscore = 0; }
+		else if (!firstScore) {
+			highscore = Save::decrypt(encryptedScore, ENCRYPTIONKEY);
+			firstScore = true;
+		}
+		else {
+			checkSum = Save::decrypt(encryptedScore, SECONDENCRYPTIONKEY);
+		}
 	}
 
 	inputFile.close();
+	std::cout << highscore << ": potential " << checkSum << std::endl;
+	//If scores don't match, we reset highscore
+	if (highscore != checkSum) {
+		highscore = 0;
+	}
 	return highscore;
 }
 
@@ -68,8 +77,8 @@ void Save::updateHighscore(unsigned int newHighScore)
 		return;
 	//We return because no need to update
 
-	std::string encryptedHighScore = Save::encrypt(newHighScore);
-
+	std::string encryptedHighScore = Save::encrypt(newHighScore,ENCRYPTIONKEY);
+	std::string encryptedVerifiedScore = Save::encrypt(newHighScore, SECONDENCRYPTIONKEY);
 	std::ifstream inputFile(fileName);
 	std::string line;
 	std::vector<std::string> lines;
@@ -87,13 +96,20 @@ void Save::updateHighscore(unsigned int newHighScore)
 		std::cerr << "Unable to write SAVE.TXT: " << fileName << std::endl;
 		return;
 	}
+	bool highScorePlaced = false;
+	bool verifiedScorePlaced = false;
 	//If outputFile opens and 
 	for (size_t i = 0; i < lines.size(); ++i) {
-		if (lines[i] == "hs") {
+		if (lines[i] == "hs" && !highScorePlaced) {
 			// Updating to the score after text highscore
 			outputFile << "hs" << std::endl;
 			++i;
-			outputFile << encryptedHighScore;
+			outputFile << encryptedHighScore << std::endl;
+			highScorePlaced = true;
+		}
+		else if (highScorePlaced && !verifiedScorePlaced) {
+			outputFile << encryptedVerifiedScore << std::endl;
+			verifiedScorePlaced = true;
 		}
 		else {
 			outputFile << lines[i] << std::endl;
