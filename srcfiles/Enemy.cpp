@@ -5,6 +5,7 @@ Enemy::Enemy(const sf::Texture& texture, const sf::Vector2f& position, int veloc
 {
 	enemyObj.setTexture(texture);
 	enemyObj.setPosition(position);
+
 	this->velocity = velocity;
 	this->offset = offset;
 }

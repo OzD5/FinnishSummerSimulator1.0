@@ -7,7 +7,7 @@ void StartMenu::initWindow(sf::RenderWindow* window)
 	this->windowRatio = this->windowWidth / 1920.f;
 
 	//Dynamically creating new window.
-	this->startwindow =window;
+	this->startwindow = window;
 	this->startwindow->setFramerateLimit(60);
 }
 
@@ -105,7 +105,7 @@ void StartMenu::pollEvents()
 	}
 }
 
-
+//Checks if you are pressing any button.
 void StartMenu::checkPress()
 {
 	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -137,10 +137,12 @@ void StartMenu::checkPress()
 
 void StartMenu::updateDifficulty()
 {
-	if (this->difficulty >= 4)
+	if (this->difficulty >= 4) {
 		this->difficulty = 1;
-	else
+	}
+	else {
 		this->difficulty++;
+	}
 	switch (difficulty)
 	{
 	case 1:
@@ -156,6 +158,7 @@ void StartMenu::updateDifficulty()
 		this->difficultyText.setString("Suomalainen");
 		break;
 	}
+	//Centering the text
 	this->difficultyText.setPosition(sf::Vector2f(
 		difficultyButton.getPosition().x + this->exitButton.getGlobalBounds().width / 2 - difficultyText.getGlobalBounds().width / 2
 		, difficultyButton.getPosition().y + 12.f));
@@ -163,10 +166,12 @@ void StartMenu::updateDifficulty()
 
 void StartMenu::updateResolution()
 {
-	if (this->resolution >= 3)
+	if (this->resolution >= 3) {
 		this->resolution = 1;
-	else
+	}
+	else {
 		this->resolution++;
+	}
 	switch (resolution)
 	{
 	case 1:
@@ -181,6 +186,7 @@ void StartMenu::updateResolution()
 	default:
 		break;
 	}
+	//Centering the text
 	this->resolutionText.setPosition(sf::Vector2f(
 		resolutionButton.getPosition().x + this->resolutionButton.getGlobalBounds().width / 2 - resolutionText.getGlobalBounds().width / 2
 		, resolutionButton.getPosition().y + 12.f));

@@ -36,6 +36,7 @@ void GameInitializer::initVariables(Game& game)
         game.health = 1100 - 100 * game.difficulty;
     }
 
+    game.stamina = 200;
     game.mouseHeld = false;
     game.isTouching = false;
     game.isMiss = false;

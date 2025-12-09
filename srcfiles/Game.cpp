@@ -3,7 +3,7 @@
 #include "Save.h"
 #include "Enemy.h"
 #include <iostream>
-
+#include "prints.cpp"
 
 void Game::spawnEnemy()
 {
@@ -14,16 +14,16 @@ void Game::spawnEnemy()
 	sf::Texture* mosquitoPic = (rand() % 2 == 1) ? mosquitoPic = &mosquitoL : &mosquitoR;
 	//Creating new enemy
 	Enemy newEnemy(*mosquitoPic, sf::Vector2f(static_cast<float>(rand() % (static_cast<int>(this->window->getSize().x - 50.f)) + 50.f),
-		0.f), type, (rand() % 100) * 10);
+		0.f), /*Speed can't be zero*/std::max(type, 1), (rand() % 100) * 10);
 
 	std::map<int, sf::Vector2f> sizeMap = {
-	  {7, sf::Vector2f(55.f, 30.f)},
-	  {6, sf::Vector2f(60.f, 70.f)},
-	  {5, sf::Vector2f(65.f, 30.f)},
-	  {4, sf::Vector2f(85.f, 50.f)},
-	  {3, sf::Vector2f(45.f, 90.f)},
-	  {2, sf::Vector2f(70.f, 70.f)},
-	  {1, sf::Vector2f(75.f, 95.f)}
+	  {6, sf::Vector2f(55.f, 30.f)},
+	  {5, sf::Vector2f(60.f, 70.f)},
+	  {4, sf::Vector2f(65.f, 30.f)},
+	  {3, sf::Vector2f(85.f, 50.f)},
+	  {2, sf::Vector2f(45.f, 90.f)},
+	  {1, sf::Vector2f(70.f, 70.f)},
+	  {0, sf::Vector2f(75.f, 95.f)},
 	};
 	
 	newEnemy.setSize(sf::Vector2f(0.003f * this->heightRatio * sizeMap[type].x, 0.003f * this->heightRatio * sizeMap[type].y));
@@ -93,6 +93,7 @@ void Game::updateUi()
 	{
 		this->regenClock.restart();
 		this->staminaBar.setSize(sf::Vector2f(curStamina + 25.f, 20.f));
+		this->stamina += 25;
 	}
 }
 
@@ -132,7 +133,7 @@ void Game::deleteEnemy()
 
 		//If we havent hit the enemy we continue. Also if we hit but we dont have stamina and the enemy not in hand we continue
 		if (!this->enemies[i].getGlobalBounds().contains(this->mousePosView) ||
-			!(staminaBar.getSize().x > 1.f || enemyOnHand))
+			!(this->stamina > 0 || enemyOnHand))
 			continue;
 
 		//Getting points based on difficulty of enemy. If enemy is already on hand we give 1 point only
@@ -158,7 +159,7 @@ void Game::deleteEnemy()
 		return;
 	}
 	//If we have stamina and we hit mosquito on skin
-	if (staminaBar.getSize().x > 0 && hitSkin)
+	if (this->stamina > 0 && hitSkin)
 	{
 		this->health -= 10;
 		this->isMiss = true;
@@ -166,11 +167,12 @@ void Game::deleteEnemy()
 
 		this->hittingHandSound.play();
 	} //If we have stamina and we didnt hit mosquito
-	else if (staminaBar.getSize().x > 0 && !hitSkin)
+	else if (this->stamina > 0 && !hitSkin)
 	{
 		this->isStaminaRegen = false;
 		this->isMiss = true;
 		this->staminaBar.setSize(sf::Vector2f(staminaBar.getSize().x - 25.f, 20.f));
+		this->stamina -= 25;
 
 		if (this->hairyHand.getGlobalBounds().contains(this->mousePosView))
 			this->hittingHandSound.play();
@@ -214,7 +216,6 @@ void Game::updateEnemyPosition(Enemy& enemy)
 {
 	float enemyX = enemy.getPosition().x;
 	float enemyY = enemy.getPosition().y;
-
 	if (!mosquitoOnHand(enemy))
 	{
 		//If enemy not on hand yet we calculate the trajectory and move it
@@ -248,11 +249,10 @@ float Game::calculateWaveX(float enemyY, int velocity, int offset) const
 
 void Game::checkEnemyBounds(Enemy& enemy)
 {
-	if (enemy.getPosition().x + enemy.getSize().x >= this->window->getSize().x)
-	{
+	while (enemy.getPosition().x + enemy.getSize().x >= this->window->getSize().x) {
 		enemy.move(-1.0f, 0);
 	}
-	else if (enemy.getPosition().x < 0)
+	while (enemy.getPosition().x < 0)
 	{
 		enemy.move(1.0f, 0);
 	}
@@ -302,13 +302,25 @@ void Game::renderRects(sf::RenderTarget& target)
 {
 	target.draw(this->hairyHand);
 	//render the enemies
-	for (auto& enemi : this->enemies)
+	for (auto& enemy : this->enemies)
 	{
-		target.draw(enemi.getEnemySprite());
+		target.draw(enemy.getEnemySprite());
 	}
 }
 
-//Constructor/Destructor
+void Game::dyingMessage() const
+{
+	sf::Text message;
+	message.setFont(this->font);
+	message.setString("You lost too much blood!");
+	message.setCharacterSize(100);
+	message.setFillColor(sf::Color::Red);
+	message.setPosition(sf::Vector2f(this->windowWidth / 2.f, this->windowHeight / 2.f));
+	this->window->draw(message);
+	sf::sleep(sf::Time(sf::seconds(2)));
+}
+
+//Constructor
 Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN, sf::RenderWindow* window)
 	: difficulty(difficultyIN)
 	, windowWidth(windowWidthIN)
@@ -322,6 +334,7 @@ Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN, 
 	, enemySpawnTimerMax(0.0f)
 	, maxEnemies(0)
 	, health(0)
+	, stamina(0)
 	, mouseHeld(false)
 	, isTouching(false)
 	, isMiss(false)
@@ -390,6 +403,7 @@ void Game::update()
 	if (this->health <= 0)
 	{
 		this->endGame = true;
+		this->dyingMessage();
 	}
 }
 

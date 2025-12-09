@@ -63,7 +63,6 @@ unsigned int Save::getHighscore()
 	}
 
 	inputFile.close();
-	std::cout << highscore << ": potential " << checkSum << std::endl;
 	//If scores don't match, we reset highscore
 	if (highscore != checkSum) {
 		highscore = 0;

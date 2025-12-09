@@ -93,6 +93,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Coding\VS2022C++\SFMLTESTI\SFMLTESTI\libraries\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -266,6 +267,7 @@
     <ClCompile Include="srcfiles\GameInitializer.cpp" />
     <ClCompile Include="srcfiles\GameManager.cpp" />
     <ClCompile Include="srcfiles\main.cpp" />
+    <ClCompile Include="srcfiles\prints.cpp" />
     <ClCompile Include="srcfiles\Save.cpp" />
     <ClCompile Include="srcfiles\StartMenu.cpp" />
   </ItemGroup>

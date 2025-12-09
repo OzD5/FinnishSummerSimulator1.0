@@ -67,6 +67,7 @@ private:
 	float enemySpawnTimerMax;
 	int maxEnemies;
 	long long health;
+	unsigned int stamina;
 
 
 	bool mouseHeld;
@@ -118,6 +119,8 @@ private:
 	void renderBlood(sf::RenderTarget& target);
 	void renderUi(sf::RenderTarget& target);
 	void renderRects(sf::RenderTarget& target);
+
+	void dyingMessage() const;
 public:
 	//construction / destruction
 	Game(short difficulty, unsigned windowWidth, unsigned windowHeight, sf::RenderWindow* window);
