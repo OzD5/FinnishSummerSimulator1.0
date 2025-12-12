@@ -1,4 +1,5 @@
 #include "Save.h"
+#include "prints.cpp"
 unsigned int Save::highscore = 0;
 const std::string Save::fileName = "Data/Saves/Save.txt";
 const int Save::ENCRYPTIONKEY = 314159265;
@@ -22,13 +23,20 @@ std::string Save::encrypt(const int& highscore, const int& encryptionKey)
 const int Save::decrypt(std::string& encryptedString, const int& encryptionKey)
 {
 	std::string xorString = "";
+	int decryptedScore = 0;
 	for (char encryptedChr : encryptedString)
 	{
 		int tempDigit = encryptedChr - 91;
 		char chrNum = tempDigit + '0';
 		xorString += chrNum;
 	}
-	int decryptedScore = std::stoi(xorString);
+	try
+	{
+		decryptedScore = std::stoi(xorString);
+	}
+	catch (const std::exception&)
+	{
+	}
 	decryptedScore ^= encryptionKey;
 	return decryptedScore;
 }
@@ -40,29 +48,31 @@ unsigned int Save::getHighscore()
 	std::string line;
 	if (!inputFile.is_open())
 	{
-		std::cerr << "Unable to open SAVE.TXT: " << fileName << std::endl;
-		return 0;
+		std::ofstream temp(fileName);
+		temp.close();
 	}
 
 	unsigned int checkSum = 0;
 	bool zeroth = false;
 	bool firstScore = false;
+	bool secondScore = false;
 	while (std::getline(inputFile, line)) {
 
 		std::string encryptedScore = line;
-		if (line == "hs") {
-			continue;
-		}
-		else if (!firstScore) {
+		if (!firstScore) {
 			highscore = Save::decrypt(encryptedScore, ENCRYPTIONKEY);
 			firstScore = true;
 		}
-		else {
+		else if (!secondScore) {
 			checkSum = Save::decrypt(encryptedScore, SECONDENCRYPTIONKEY);
+			secondScore = true;
 		}
 	}
 
 	inputFile.close();
+	using namespace OZ::PRINTS;
+	print(highscore);
+	print(checkSum);
 	//If scores don't match, we reset highscore
 	if (highscore != checkSum) {
 		highscore = 0;
@@ -98,20 +108,6 @@ void Save::updateHighscore(unsigned int newHighScore)
 	bool highScorePlaced = false;
 	bool verifiedScorePlaced = false;
 	//If outputFile opens and 
-	for (size_t i = 0; i < lines.size(); ++i) {
-		if (lines[i] == "hs" && !highScorePlaced) {
-			// Updating to the score after text highscore
-			outputFile << "hs" << std::endl;
-			++i;
-			outputFile << encryptedHighScore << std::endl;
-			highScorePlaced = true;
-		}
-		else if (highScorePlaced && !verifiedScorePlaced) {
-			outputFile << encryptedVerifiedScore << std::endl;
-			verifiedScorePlaced = true;
-		}
-		else {
-			outputFile << lines[i] << std::endl;
-		}
-	}
+	outputFile << encryptedHighScore << std::endl;
+	outputFile << encryptedVerifiedScore << std::endl;
 }

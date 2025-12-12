@@ -40,7 +40,7 @@ void GameInitializer::initVariables(Game& game)
     game.stamina = 200;
     game.mouseHeld = false;
     game.isTouching = false;
-    game.isMiss = false;
+    game.makeBloodSplatter = false;
     game.isStaminaRegen = false;
     game.speedX = 5.f;
     game.speedY = 1.f * game.difficulty;

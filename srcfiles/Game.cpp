@@ -157,24 +157,20 @@ void Game::deleteEnemy()
 		break;
 	}
 	// If we hit enemy in air
-	if (deleted && !hitSkin)
-	{
+	if (deleted && !hitSkin) {
 		this->hittingInsectSound.play();
 		return;
 	}
 	//If we have stamina and we hit mosquito on skin
-	if (this->stamina > 0 && hitSkin)
-	{
+	if (this->stamina > 0 && hitSkin) {
 		this->health -= 10;
-		this->isMiss = true;
+		this->makeBloodSplatter = true;
 		this->bloodClock.restart();
 
 		this->hittingHandSound.play();
 	} //If we have stamina and we didnt hit mosquito
-	else if (this->stamina > 0 && !hitSkin)
-	{
+	else if (this->stamina > 0 && !hitSkin) {
 		this->isStaminaRegen = false;
-		this->isMiss = true;
 		this->staminaBar.setSize(sf::Vector2f(staminaBar.getSize().x - 25.f, 20.f));
 		this->stamina -= 25;
 
@@ -285,7 +281,7 @@ void Game::renderBlood(sf::RenderTarget& target)
 	}
 	else
 	{
-		this->isMiss = false;
+		this->makeBloodSplatter = false;
 		bloodBathObj.setColor(sf::Color(255, 255, 255, 255));
 	}
 }
@@ -344,7 +340,7 @@ Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN, 
 	, stamina(0)
 	, mouseHeld(false)
 	, isTouching(false)
-	, isMiss(false)
+	, makeBloodSplatter(false)
 	, isStaminaRegen(false)
 	, speedX(0.0f)
 	, speedY(0.0f)
@@ -392,6 +388,7 @@ void Game::onGameEnd() {
 	if (this->health <= 0) {
 
 		this->dyingSound.play();
+		//Death menu loop
 		while (!this->exitToStartMenu) {
 			this->update();
 			this->render();
@@ -435,9 +432,11 @@ void Game::render()
 	this->window->clear(sf::Color(135, 206, 250));
 	//Render Background first
 	this->window->draw(this->backGroundObj);
-	//Game draw here
+
+	//Drawing game objects
 	this->renderRects(*this->window);
-	if (isMiss) {
+	//
+	if (this->makeBloodSplatter) {
 		this->renderBlood(*this->window);
 	}
 	this->renderUi(*this->window);

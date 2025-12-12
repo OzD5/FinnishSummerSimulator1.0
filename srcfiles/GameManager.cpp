@@ -61,7 +61,6 @@ void GameManager::runStartMenu(int windowWidth, int windowHeight, sf::RenderWind
 void GameManager::runGame(short difficulty, int windowWidth, int windowHeight, sf::RenderWindow* window)
 {
 	//Can't use smartpointers here. They're not so smart afterall
-	//std::unique_ptr<Game> game = std::make_unique<Game>(difficulty, windowWidth, windowHeight, window);
 	Game* game = new Game(difficulty, windowWidth, windowHeight, window);
 
 	//Game loop
@@ -73,6 +72,7 @@ void GameManager::runGame(short difficulty, int windowWidth, int windowHeight, s
 		//Render
 		game->render();
 	}
+	//Saving progress and running death menu
 	game->onGameEnd();
 
 	//After game ends we go back to menu

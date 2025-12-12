@@ -76,7 +76,7 @@ private:
 
 	bool mouseHeld;
 	bool isTouching;
-	bool isMiss;
+	bool makeBloodSplatter;
 	bool isStaminaRegen;
 	
 	float speedX;
