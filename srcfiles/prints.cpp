@@ -21,7 +21,7 @@ namespace OZ
 		template<typename T> requires (IsContainer<T>)
 			static inline void printV(const T& l)
 		{
-			std::cout << "{";
+			std::cout << "[";
 			if constexpr (IsContainer<typename T::value_type>)
 			{
 				std::cout << std::endl;
@@ -42,8 +42,7 @@ namespace OZ
 						if (temp != l.end()) std::cout << std::get<0>(*it) << ":" << std::get<1>(*it) << ",";
 						else std::cout << std::get<0>(*it) << ":" << std::get<1>(*it);
 					}
-					else if constexpr (!(requires { std::get<0>(*it); std::get<1>(*it); }))
-					{
+					else {
 						auto temp = it;
 						temp++;
 						if (temp != l.end()) std::cout << *it << ",";
@@ -51,7 +50,7 @@ namespace OZ
 					}
 				}
 			}
-			std::cout << "}";
+			std::cout << "]";
 		}
 		template<typename T>
 		static void print(const T& a)

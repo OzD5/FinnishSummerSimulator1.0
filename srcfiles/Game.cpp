@@ -16,22 +16,22 @@ void Game::spawnEnemy()
 	Enemy newEnemy(*mosquitoPic, sf::Vector2f(static_cast<float>(rand() % (static_cast<int>(this->window->getSize().x - 50.f)) + 50.f),
 		0.f), /*Speed can't be zero*/std::max(type, 1), (rand() % 100) * 10);
 
-	std::map<int, sf::Vector2f> sizeMap = {
-	  {6, sf::Vector2f(55.f, 30.f)},
-	  {5, sf::Vector2f(60.f, 70.f)},
-	  {4, sf::Vector2f(65.f, 30.f)},
-	  {3, sf::Vector2f(85.f, 50.f)},
-	  {2, sf::Vector2f(45.f, 90.f)},
-	  {1, sf::Vector2f(70.f, 70.f)},
-	  {0, sf::Vector2f(75.f, 95.f)},
+
+	sf::Vector2f enemySizes[7] = {
+		sf::Vector2f(75.f, 95.f), 
+		sf::Vector2f(70.f, 70.f), 
+		sf::Vector2f(45.f, 90.f),
+		sf::Vector2f(50.f, 85.f),
+		sf::Vector2f(85.f, 50.f), 
+		sf::Vector2f(65.f, 30.f), 
+		sf::Vector2f(55.f, 30.f)
 	};
 	
-	newEnemy.setSize(sf::Vector2f(0.003f * this->heightRatio * sizeMap[type].x, 0.003f * this->heightRatio * sizeMap[type].y));
+	newEnemy.setSize(sf::Vector2f(0.003f * this->heightRatio * enemySizes[type].x, 0.003f * this->heightRatio * enemySizes[type].y));
 
 	this->enemies.push_back(newEnemy);
 	
 }
-
 void Game::pollEvents()
 {
 	while (this->window->pollEvent(this->ev))
@@ -76,14 +76,13 @@ void Game::updateUi()
 
 
 	//Stamina
-	float curStamina = this->staminaBar.getSize().x;
+	unsigned curStamina = this->stamina;
 	std::stringstream staminaString;
 	staminaString << "Stamina: " << curStamina;
 	this->staminaText.setString(staminaString.str());
 
 
 	//Stamina bar logic
-
 	if (curStamina < 199.f && !isStaminaRegen)
 	{
 		this->regenClock.restart();
@@ -314,10 +313,13 @@ void Game::dyingMessage() const
 	message.setFont(this->font);
 	message.setString("You lost too much blood!");
 	message.setCharacterSize(100);
-	message.setFillColor(sf::Color::Red);
+	message.setOutlineColor(sf::Color::Black);
+	message.setOutlineThickness(0.5f);
+	message.setFillColor(sf::Color::White);
 	message.setPosition(sf::Vector2f(this->windowWidth / 2.f, this->windowHeight / 2.f));
+
 	this->window->draw(message);
-	sf::sleep(sf::Time(sf::seconds(2)));
+
 }
 
 //Constructor
