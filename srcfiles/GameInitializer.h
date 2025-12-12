@@ -19,5 +19,4 @@ private:
     static void initGraphics(Game& game);
     static void initSounds(Game& game);
     static void initHand(Game& game);
-
 };

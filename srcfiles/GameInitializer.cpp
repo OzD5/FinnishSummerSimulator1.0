@@ -18,6 +18,7 @@ void GameInitializer::initVariables(Game& game)
 
     // Game logic
     game.endGame = false;
+    game.exitToStartMenu = false;
     game.highscore = Save::getHighscore();
     game.points = 0;
     game.enemySpawnTimerMax = 200.f;
@@ -203,6 +204,11 @@ void GameInitializer::initSounds(Game& game)
     }
     game.hittingInsectSound.setBuffer(game.hittingInsectFile);
     game.hittingInsectSound.setVolume(50);
+    if (!(game.dyingSoundFile).loadFromFile("Data/Sounds/deathSound.ogg"))
+    {
+        std::cout << "GAMEINITIALIZER::INITMUSIC::DEATHSOUND.OGG NOT FOUND";
+    }
+    game.dyingSound.setBuffer(game.dyingSoundFile);
 
 }
 

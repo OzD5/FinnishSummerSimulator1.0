@@ -43,7 +43,12 @@ void Game::pollEvents()
 			break;
 
 		case sf::Event::KeyPressed:
-			if (this->ev.key.code == sf::Keyboard::Escape) this->endGame = true;
+			if (this->ev.key.code == sf::Keyboard::Escape) {
+				this->endGame = true;
+			}
+			else if (this->ev.key.code == sf::Keyboard::Enter) {
+				this->exitToStartMenu = true;
+			}
 			break;
 		}
 	}
@@ -307,17 +312,16 @@ void Game::renderRects(sf::RenderTarget& target)
 	}
 }
 
-void Game::dyingMessage() const
+void Game::renderDyingMessage(sf::RenderTarget& target) const
 {
 	sf::Text message;
 	message.setFont(this->font);
-	message.setString("You lost too much blood!");
+	message.setString("You lost too much blood!\nPress enter to continue...");
 	message.setCharacterSize(100);
 	message.setOutlineColor(sf::Color::Black);
-	message.setOutlineThickness(0.5f);
-	message.setFillColor(sf::Color::White);
-	message.setPosition(sf::Vector2f(this->windowWidth / 2.f, this->windowHeight / 2.f));
-
+	message.setOutlineThickness(2.f);
+	message.setFillColor(sf::Color::Red);
+	message.setPosition(sf::Vector2f(this->windowWidth / 2.f - message.getGlobalBounds().width/2, this->windowHeight / 2.f));
 	this->window->draw(message);
 
 }
@@ -330,6 +334,7 @@ Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN, 
 	, heightRatio(0.0f)
 	, widthRatio(0.0f)
 	, endGame(false)
+	, exitToStartMenu(false)
 	, highscore(0)
 	, points(0)
 	, enemySpawnTimer(0.0f)
@@ -371,14 +376,27 @@ const bool Game::getEndGame() const
 	return this->endGame;
 }
 
-void Game::updateHighScore() const
-{
-	Save::updateHighscore(this->points);
-}
 
 void Game::silenceMusic()
 {
 	this->musicOST.pause();
+}
+
+void Game::onGameEnd() {
+
+	Save::updateHighscore(this->points);
+
+	//Sounds
+	this->silenceMusic();
+	this->exitToStartMenu = false;
+	if (this->health <= 0) {
+
+		this->dyingSound.play();
+		while (!this->exitToStartMenu) {
+			this->update();
+			this->render();
+		}
+	}
 }
 
 void Game::update()
@@ -404,8 +422,8 @@ void Game::update()
 	//Health check
 	if (this->health <= 0)
 	{
+		this->updateMousePos();
 		this->endGame = true;
-		this->dyingMessage();
 	}
 }
 
@@ -419,9 +437,12 @@ void Game::render()
 	this->window->draw(this->backGroundObj);
 	//Game draw here
 	this->renderRects(*this->window);
-	if (isMiss)
+	if (isMiss) {
 		this->renderBlood(*this->window);
+	}
 	this->renderUi(*this->window);
-
+	if (this->health <= 0) {
+		this->renderDyingMessage(*this->window);
+	}
 	this->window->display();
 }

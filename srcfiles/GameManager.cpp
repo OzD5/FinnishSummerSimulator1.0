@@ -73,8 +73,8 @@ void GameManager::runGame(short difficulty, int windowWidth, int windowHeight, s
 		//Render
 		game->render();
 	}
-	game->silenceMusic();
-	game->updateHighScore();
+	game->onGameEnd();
+
 	//After game ends we go back to menu
 	delete game;
 	this->runStartMenu(this->windowWidth, this->windowHeight, window);

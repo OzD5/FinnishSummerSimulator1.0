@@ -51,6 +51,9 @@ private:
 
 	sf::SoundBuffer hittingInsectFile;
 	sf::Sound hittingInsectSound;
+
+	sf::SoundBuffer dyingSoundFile;
+	sf::Sound dyingSound;
 	// Game Logic
 	short difficulty;
 	unsigned windowHeight;
@@ -60,6 +63,7 @@ private:
 	float widthRatio;
 
 	bool endGame;
+	bool exitToStartMenu;
 	unsigned int highscore;
 	unsigned int points;
 
@@ -103,8 +107,8 @@ private:
 
 	//Functions
 	void spawnEnemy();
-	void pollEvents();
 
+	void pollEvents();
 	void updateMousePos();
 	void updateUi();
 	void updateSpeed();
@@ -119,8 +123,7 @@ private:
 	void renderBlood(sf::RenderTarget& target);
 	void renderUi(sf::RenderTarget& target);
 	void renderRects(sf::RenderTarget& target);
-
-	void dyingMessage() const;
+	void renderDyingMessage(sf::RenderTarget& target) const;
 public:
 	//construction / destruction
 	Game(short difficulty, unsigned windowWidth, unsigned windowHeight, sf::RenderWindow* window);
@@ -129,8 +132,8 @@ public:
 	//Accessors
 	const bool running() const;
 	const bool getEndGame() const;
-	void updateHighScore() const;
 	void silenceMusic();
+	void onGameEnd();
 
 	void update();
 	void render();
