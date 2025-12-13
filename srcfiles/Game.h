@@ -54,6 +54,8 @@ private:
 
 	sf::SoundBuffer dyingSoundFile;
 	sf::Sound dyingSound;
+
+	std::string saveFilePath;
 	// Game Logic
 	short difficulty;
 	unsigned windowHeight;

@@ -3,8 +3,7 @@
 unsigned int Save::highscore = 0;
 const std::string Save::fileName = "Data/Saves/Save.txt";
 const int Save::ENCRYPTIONKEY = 314159265;
-const int Save::SECONDENCRYPTIONKEY = 27182818;
-
+const int Save::SECONDENCRYPTIONKEY = 271828182;
 //Very Simple encryption. Won't be THAT easy to change Highscore
 std::string Save::encrypt(const int& highscore, const int& encryptionKey)
 {
@@ -22,6 +21,7 @@ std::string Save::encrypt(const int& highscore, const int& encryptionKey)
 
 const int Save::decrypt(std::string& encryptedString, const int& encryptionKey)
 {
+
 	std::string xorString = "";
 	int decryptedScore = 0;
 	for (char encryptedChr : encryptedString)
@@ -41,9 +41,11 @@ const int Save::decrypt(std::string& encryptedString, const int& encryptionKey)
 	return decryptedScore;
 }
 
-// TODO: YAMLI FILE
-unsigned int Save::getHighscore()
+
+// Encryption variable in range 1 - 10
+unsigned int Save::getHighscore(const std::string& fileName)
 {
+
 	std::ifstream inputFile(fileName);
 	std::string line;
 	if (!inputFile.is_open())
@@ -70,9 +72,6 @@ unsigned int Save::getHighscore()
 	}
 
 	inputFile.close();
-	using namespace OZ::PRINTS;
-	print(highscore);
-	print(checkSum);
 	//If scores don't match, we reset highscore
 	if (highscore != checkSum) {
 		highscore = 0;
@@ -80,7 +79,7 @@ unsigned int Save::getHighscore()
 	return highscore;
 }
 
-void Save::updateHighscore(unsigned int newHighScore)
+void Save::updateHighscore(unsigned int newHighScore, const std::string& fileName)
 {
 	if (newHighScore < highscore)
 		return;

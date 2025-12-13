@@ -16,10 +16,13 @@ void GameInitializer::initVariables(Game& game)
     game.widthRatio = static_cast<float>(game.windowWidth) / 1920.f;
     game.heightRatio = static_cast<float>(game.windowHeight) / 1080.f;
 
+    // Save file is Save(lvl num).txt
+    game.saveFilePath = "Data/Saves/Save" + std::to_string(game.difficulty) + ".txt";
+    game.highscore = Save::getHighscore(game.saveFilePath);
+
     // Game logic
     game.endGame = false;
     game.exitToStartMenu = false;
-    game.highscore = Save::getHighscore();
     game.points = 0;
     game.enemySpawnTimerMax = 200.f;
 

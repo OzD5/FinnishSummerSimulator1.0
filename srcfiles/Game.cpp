@@ -354,7 +354,7 @@ Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN, 
 
 Game::~Game()
 {
-	Save::updateHighscore(this->points);
+	Save::updateHighscore(this->points,this->saveFilePath);
 }
 
 //Always check if game is running
@@ -380,7 +380,7 @@ void Game::silenceMusic()
 
 void Game::onGameEnd() {
 
-	Save::updateHighscore(this->points);
+	Save::updateHighscore(this->points,this->saveFilePath);
 
 	//Sounds
 	this->silenceMusic();

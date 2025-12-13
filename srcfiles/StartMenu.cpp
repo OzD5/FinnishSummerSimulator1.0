@@ -67,7 +67,7 @@ void StartMenu::setupButton(sf::Sprite& button, float x, float y) const
 void StartMenu::setupText(sf::Text& buttonText, const std::string& text, float x, float y) const
 {
 	buttonText.setFont(font);
-	buttonText.setCharacterSize(45*windowRatio);
+	buttonText.setCharacterSize(45*static_cast<unsigned>(windowRatio));
 	buttonText.setFillColor(sf::Color::White);
 	buttonText.setOutlineColor(sf::Color::Black);
 	buttonText.setString(text);

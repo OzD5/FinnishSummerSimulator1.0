@@ -12,10 +12,10 @@ private:
 	static const std::string fileName;
 	static const int ENCRYPTIONKEY;
 	static const int SECONDENCRYPTIONKEY;
-	
-public:
-	static unsigned int getHighscore();
-	static void updateHighscore(unsigned int newHighScore);
+
 	static std::string encrypt(const int& highscore, const int& encryptionKey);
 	static const int decrypt(std::string& encryptedString, const int& encryptionKey);
+public:
+	static unsigned int getHighscore(const std::string& filePath);
+	static void updateHighscore(unsigned int newHighScore, const std::string& filePath);
 };	
