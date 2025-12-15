@@ -7,7 +7,7 @@ GameManager::GameManager(int windowWidth_in, int windowHeight_in, sf::RenderWind
 
 }
 
-void GameManager::changeResoluton(short resolution, sf::RenderWindow* window)
+void GameManager::changeResoluton(const short& resolution, sf::RenderWindow* window)
 {
 	switch (resolution)
 	{
@@ -24,6 +24,8 @@ void GameManager::changeResoluton(short resolution, sf::RenderWindow* window)
 		this->windowHeight = 1440;
 		break;
 	default:
+		this->windowWidth = 1920;
+		this->windowHeight = 1080;
 		break;
 	}
 	//Fixed changing the window. 
@@ -49,7 +51,7 @@ void GameManager::runStartMenu(int windowWidth, int windowHeight, sf::RenderWind
 	}
 	this->difficulty = startMenu->getDifficulty();
 	short resolution = startMenu->getResolution();
-	//TODO: RESOLUTION CHANGE NOT WORKING
+
 	changeResoluton(resolution, window);
 	delete startMenu;
 
@@ -58,7 +60,7 @@ void GameManager::runStartMenu(int windowWidth, int windowHeight, sf::RenderWind
 
 }
 
-void GameManager::runGame(short difficulty, int windowWidth, int windowHeight, sf::RenderWindow* window)
+void GameManager::runGame(const short& difficulty, const int& windowWidth,const int& windowHeight, sf::RenderWindow* window)
 {
 	//Can't use smartpointers here. They're not so smart afterall
 	Game* game = new Game(difficulty, windowWidth, windowHeight, window);

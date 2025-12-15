@@ -37,13 +37,15 @@ void StartMenu::initUI()
 
 	float centerWidth = static_cast<float>(this->windowWidth / 2);
 	float centerHeight = static_cast<float>(this->windowHeight / 2);
+
 	setupButton(startButton, centerWidth, centerHeight);
 	setupButton(difficultyButton, centerWidth, centerHeight + 100.f*windowRatio);
 	setupButton(resolutionButton, centerWidth, centerHeight + 200.f*windowRatio);
 	setupButton(exitButton, centerWidth, centerHeight + 300.f*windowRatio);
+
 	//TODO RESOLUTION CHANGE NOT WORKING PROPERLY
 	setupText(this->startText, "Begin journey", startButton.getPosition().x, startButton.getPosition().y);
-	setupText(this->difficultyText, "Easy", difficultyButton.getPosition().x, difficultyButton.getPosition().y);
+	setupText(this->difficultyText, "Level 1", difficultyButton.getPosition().x, difficultyButton.getPosition().y);
 	setupText(this->resolutionText, "1080p", resolutionButton.getPosition().x, resolutionButton.getPosition().y);
 	setupText(this->exitText, "Exit game", exitButton.getPosition().x, exitButton.getPosition().y);
 
@@ -146,16 +148,16 @@ void StartMenu::updateDifficulty()
 	switch (difficulty)
 	{
 	case 1:
-		this->difficultyText.setString("Easy");
+		this->difficultyText.setString("Level 1");
 		break;
 	case 2:
-		this->difficultyText.setString("Medium");
+		this->difficultyText.setString("Level 2");
 		break;
 	case 3:
-		this->difficultyText.setString("Hard");
+		this->difficultyText.setString("Level 3");
 		break;
 	case 4:
-		this->difficultyText.setString("Suomalainen");
+		this->difficultyText.setString("Level 4");
 		break;
 	}
 	//Centering the text

@@ -91,6 +91,7 @@ private:
 	sf::Texture handTexture;
 	sf::Sprite hairyHand;
 	std::vector<Enemy> enemies;
+	std::vector<sf::Sprite> bitemarks;
 
 	//Graphics
 	sf::Texture backGround;
@@ -102,6 +103,7 @@ private:
 	sf::Texture bloodBath;
 	sf::Sprite bloodBathObj;
 	sf::Clock bloodClock;
+	sf::Texture bloodBitemark;
 
 	//Game Initializer can access private variables of Game class
 	friend class GameInitializer;

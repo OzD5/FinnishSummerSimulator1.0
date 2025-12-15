@@ -146,6 +146,10 @@ void GameInitializer::initGraphics(Game& game)
         game.backGroundObj.setScale(1.3f * game.widthRatio, 1.1f * game.heightRatio);
         game.backGroundObj.setPosition(0, 0);
     }
+    if (!(game.bloodBitemark).loadFromFile("Data/Graphics/BloodBitemark.png"))
+    {
+        std::cout << "GAMEINITIALIZER::INITGRAPHICS::BLOODBITEMARK.PNG NOT FOUND";
+    }
     //Mosquito Pictures
     if (!game.mosquitoL.loadFromFile("Data/Graphics/mosquitoLL.png"))
     {

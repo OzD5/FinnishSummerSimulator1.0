@@ -11,7 +11,7 @@ void Game::spawnEnemy()
 	int type = (rand() % 7);
 
 	//Half of mosquitos look right and half look left
-	sf::Texture* mosquitoPic = (rand() % 2 == 1) ? mosquitoPic = &mosquitoL : &mosquitoR;
+	sf::Texture* mosquitoPic = (rand() % 2 == 1) ? mosquitoPic = &this->mosquitoL : &this->mosquitoR;
 	//Creating new enemy
 	Enemy newEnemy(*mosquitoPic, sf::Vector2f(static_cast<float>(rand() % (static_cast<int>(this->window->getSize().x - 50.f)) + 50.f),
 		0.f), /*Speed can't be zero*/std::max(type, 1), (rand() % 100) * 10);
@@ -130,6 +130,7 @@ void Game::deleteEnemy()
 	this->mouseHeld = true;
 	bool deleted = false;
 	bool hitSkin = false;
+	sf::Vector2f bitemarkCoords;
 	for (size_t i = 0; i < this->enemies.size() && deleted == false; i++)
 	{
 		//Check if you hit enemy and that there's enough stamina
@@ -150,6 +151,7 @@ void Game::deleteEnemy()
 		{
 			this->points += 1;
 			hitSkin = true;
+			bitemarkCoords = this->enemies[i].getPosition();
 		}
 		//delete enemy and break loop so that we dont iterate more because we found our target and because our vector changes.
 		deleted = true;
@@ -168,6 +170,13 @@ void Game::deleteEnemy()
 		this->bloodClock.restart();
 
 		this->hittingHandSound.play();
+		//Making bitemark
+		sf::Sprite newBitemark(this->bloodBitemark);
+		newBitemark.setPosition(bitemarkCoords);
+		newBitemark.setScale(sf::Vector2f(this->heightRatio, this->heightRatio));
+		this->bitemarks.push_back(newBitemark);
+		
+
 	} //If we have stamina and we didnt hit mosquito
 	else if (this->stamina > 0 && !hitSkin) {
 		this->isStaminaRegen = false;
@@ -302,9 +311,11 @@ void Game::renderRects(sf::RenderTarget& target)
 {
 	target.draw(this->hairyHand);
 	//render the enemies
-	for (auto& enemy : this->enemies)
-	{
+	for (auto& enemy : this->enemies) {
 		target.draw(enemy.getEnemySprite());
+	}
+	for (const auto& bitemark : this->bitemarks) {
+		target.draw(bitemark);
 	}
 }
 
