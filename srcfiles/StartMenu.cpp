@@ -194,11 +194,6 @@ void StartMenu::updateResolution()
 		, resolutionButton.getPosition().y + 12.f));
 }
 
-void StartMenu::updateMousePos()
-{
-	this->mousePosWindow = sf::Mouse::getPosition(*this->startwindow);
-	this->mousePosView = this->startwindow->mapPixelToCoords(this->mousePosWindow);
-}
 
 void StartMenu::update()
 {
@@ -233,6 +228,12 @@ void StartMenu::render()
 	this->renderButtons(*this->startwindow);
 
 	this->startwindow->display();
+}
+
+void StartMenu::updateMousePos()
+{
+	this->mousePosWindow = sf::Mouse::getPosition(*this->startwindow);
+	this->mousePosView = this->startwindow->mapPixelToCoords(this->mousePosWindow);
 }
 
 void StartMenu::silenceMusic()

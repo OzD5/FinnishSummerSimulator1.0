@@ -312,6 +312,9 @@
     <ClInclude Include="srcfiles\GameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="srcfiles\PauseMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libraries\include\SFML\Audio\SoundFileFactory.inl">
@@ -365,6 +368,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="srcfiles\prints.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="srcfiles\PauseMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

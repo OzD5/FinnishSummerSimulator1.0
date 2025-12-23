@@ -37,8 +37,8 @@ private:
 	sf::Sprite resolutionButton;
 	sf::Sprite exitButton;
 
-	unsigned windowHeight;
-	unsigned windowWidth;
+	int windowHeight;
+	int windowWidth;
 	float windowRatio;
 	bool endMenu;
 	bool mouseHold;
@@ -51,7 +51,6 @@ private:
 	void checkPress();
 	void updateDifficulty();
 	void updateResolution();
-	void updateMousePos();
 	void initWindow(sf::RenderWindow* window);
 	void initVariables();
 	void initUI();
@@ -64,6 +63,7 @@ private:
 public:
 	void update();
 	void render();
+	void updateMousePos();
 	void silenceMusic();
 
 	short getResolution() const;

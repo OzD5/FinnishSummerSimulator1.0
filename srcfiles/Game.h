@@ -19,6 +19,22 @@ class GameInitializer;
 */
 class Game
 {
+public:
+	//construction / destruction
+	Game(short difficulty, unsigned windowWidth, unsigned windowHeight, sf::RenderWindow* window);
+	Game(const Game&) = delete;
+	Game& operator=(const Game&) = delete;
+	virtual ~Game();
+
+	//Accessors
+	bool running() const;
+	bool getEndGame() const;
+	bool getPauseMenu() const;
+	void silenceMusic();
+	void onGameEnd();
+
+	void update();
+	void render();
 private:
 	sf::RenderWindow* window;
 	sf::Event ev;
@@ -64,6 +80,7 @@ private:
 	float heightRatio;
 	float widthRatio;
 
+	bool toPauseMenu;
 	bool endGame;
 	bool exitToStartMenu;
 	unsigned int highscore;
@@ -110,6 +127,7 @@ private:
 
 
 	//Functions
+
 	void spawnEnemy();
 
 	void pollEvents();
@@ -128,17 +146,4 @@ private:
 	void renderUi(sf::RenderTarget& target);
 	void renderRects(sf::RenderTarget& target);
 	void renderDyingMessage(sf::RenderTarget& target) const;
-public:
-	//construction / destruction
-	Game(short difficulty, unsigned windowWidth, unsigned windowHeight, sf::RenderWindow* window);
-	virtual ~Game();
-
-	//Accessors
-	const bool running() const;
-	const bool getEndGame() const;
-	void silenceMusic();
-	void onGameEnd();
-
-	void update();
-	void render();
 };

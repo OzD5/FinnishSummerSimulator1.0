@@ -22,6 +22,7 @@ void GameInitializer::initVariables(Game& game)
 
     // Game logic
     game.endGame = false;
+    game.toPauseMenu = false;
     game.exitToStartMenu = false;
     game.points = 0;
     game.enemySpawnTimerMax = 200.f;

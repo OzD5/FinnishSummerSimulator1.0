@@ -1,5 +1,6 @@
 #pragma once
 #include "Game.h"
+#include "PauseMenu.h"
 #include "StartMenu.h"
 
 class GameManager

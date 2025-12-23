@@ -249,6 +249,7 @@
     <ClInclude Include="libraries\include\SFML\Window\WindowHandle.hpp" />
     <ClInclude Include="libraries\include\SFML\Window\WindowStyle.hpp" />
     <ClInclude Include="srcfiles\GameManager.h" />
+    <ClInclude Include="srcfiles\PauseMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libraries\include\SFML\Audio\SoundFileFactory.inl" />
@@ -267,6 +268,7 @@
     <ClCompile Include="srcfiles\GameInitializer.cpp" />
     <ClCompile Include="srcfiles\GameManager.cpp" />
     <ClCompile Include="srcfiles\main.cpp" />
+    <ClCompile Include="srcfiles\PauseMenu.cpp" />
     <ClCompile Include="srcfiles\prints.cpp" />
     <ClCompile Include="srcfiles\Save.cpp" />
     <ClCompile Include="srcfiles\StartMenu.cpp" />

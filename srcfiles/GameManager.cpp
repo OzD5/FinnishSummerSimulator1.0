@@ -64,15 +64,20 @@ void GameManager::runGame(const short& difficulty, const int& windowWidth,const 
 {
 	//Can't use smartpointers here. They're not so smart afterall
 	Game* game = new Game(difficulty, windowWidth, windowHeight, window);
-
+	PauseMenu* pauseMenu = new PauseMenu(window, windowWidth, windowHeight);
 	//Game loop
 	while (game->running() && !game->getEndGame())
 	{
+		if (!game->getPauseMenu()) {
 
-		game->update();
+			game->update();
+			game->render();
+		}
+		else {
+			pauseMenu->update();
+			pauseMenu->render();
+		}
 
-		//Render
-		game->render();
 	}
 	//Saving progress and running death menu
 	game->onGameEnd();

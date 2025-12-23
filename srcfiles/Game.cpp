@@ -5,6 +5,137 @@
 #include <iostream>
 #include "prints.cpp"
 
+//Constructor
+Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN, sf::RenderWindow* window)
+	: difficulty(difficultyIN)
+	, windowWidth(windowWidthIN)
+	, windowHeight(windowHeightIN)
+	, heightRatio(0.0f)
+	, widthRatio(0.0f)
+	, endGame(false)
+	, toPauseMenu(false)
+	, exitToStartMenu(false)
+	, highscore(0)
+	, points(0)
+	, enemySpawnTimer(0.0f)
+	, enemySpawnTimerMax(0.0f)
+	, maxEnemies(0)
+	, health(0)
+	, stamina(0)
+	, mouseHeld(false)
+	, isTouching(false)
+	, makeBloodSplatter(false)
+	, isStaminaRegen(false)
+	, speedX(0.0f)
+	, speedY(0.0f)
+	, mltplr(0)
+	, ev()
+	, window(window)
+{
+	//Initting the values of Game variables in Gameinitializer class
+	GameInitializer::init(*this,window);
+}
+
+Game::~Game()
+{
+	Save::updateHighscore(this->points,this->saveFilePath);
+}
+
+//Always check if game is running
+bool Game::running() const
+{
+	//Check that window isn't a null pointer
+	if (this->window) {
+		return this->window->isOpen();
+	}
+	return false;
+}
+
+bool Game::getEndGame() const
+{
+	return this->endGame;
+}
+
+bool Game::getPauseMenu() const
+{
+	return this->toPauseMenu;
+}
+
+
+void Game::silenceMusic()
+{
+	this->musicOST.pause();
+}
+
+void Game::onGameEnd() {
+
+	Save::updateHighscore(this->points,this->saveFilePath);
+
+	//Sounds
+	this->silenceMusic();
+	this->exitToStartMenu = false;
+	if (this->health <= 0) {
+
+		this->dyingSound.play();
+		//Death menu loop
+		while (!this->exitToStartMenu) {
+			this->update();
+			this->render();
+		}
+	}
+}
+
+void Game::update()
+{
+	this->pollEvents();
+	this->updateMousePos();
+
+	//Update mouse pos
+	if (!this->endGame)
+	{
+
+		this->updateUi();
+
+		this->updateSpeed();
+
+		this->updateEnemies();
+
+		this->moveHand();
+
+		this->deleteEnemy();
+
+	}
+	//Health check
+	if (this->health <= 0)
+	{
+		this->endGame = true;
+	}
+}
+
+void Game::render()
+{
+	/*
+		Renders game objects. First clear the last frame, then render obejcts, then display frame
+	*/
+	this->window->clear(sf::Color(135, 206, 250));
+	//Render Background first
+	this->window->draw(this->backGroundObj);
+
+	//Drawing game objects
+	this->renderRects(*this->window);
+	//
+	if (this->makeBloodSplatter) {
+		this->renderBlood(*this->window);
+	}
+	this->renderUi(*this->window);
+	if (this->health <= 0) {
+		this->renderDyingMessage(*this->window);
+	}
+	this->window->display();
+}
+
+
+
 void Game::spawnEnemy()
 {
 	// Spawn enemies with random type, and random velocity
@@ -44,7 +175,7 @@ void Game::pollEvents()
 
 		case sf::Event::KeyPressed:
 			if (this->ev.key.code == sf::Keyboard::Escape) {
-				this->endGame = true;
+				this->toPauseMenu = true;
 			}
 			else if (this->ev.key.code == sf::Keyboard::Enter) {
 				this->exitToStartMenu = true;
@@ -54,8 +185,7 @@ void Game::pollEvents()
 	}
 }
 
-void Game::updateMousePos()
-{
+void Game::updateMousePos() {
 	this->mousePosWindow = sf::Mouse::getPosition(*this->window);
 	this->mousePosView = this->window->mapPixelToCoords(this->mousePosWindow);
 }
@@ -333,126 +463,3 @@ void Game::renderDyingMessage(sf::RenderTarget& target) const
 
 }
 
-//Constructor
-Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN, sf::RenderWindow* window)
-	: difficulty(difficultyIN)
-	, windowWidth(windowWidthIN)
-	, windowHeight(windowHeightIN)
-	, heightRatio(0.0f)
-	, widthRatio(0.0f)
-	, endGame(false)
-	, exitToStartMenu(false)
-	, highscore(0)
-	, points(0)
-	, enemySpawnTimer(0.0f)
-	, enemySpawnTimerMax(0.0f)
-	, maxEnemies(0)
-	, health(0)
-	, stamina(0)
-	, mouseHeld(false)
-	, isTouching(false)
-	, makeBloodSplatter(false)
-	, isStaminaRegen(false)
-	, speedX(0.0f)
-	, speedY(0.0f)
-	, mltplr(0)
-	, ev()
-	, window(window)
-{
-	//Initting the values of Game variables in Gameinitializer class
-	GameInitializer::init(*this,window);
-}
-
-Game::~Game()
-{
-	Save::updateHighscore(this->points,this->saveFilePath);
-}
-
-//Always check if game is running
-const bool Game::running() const
-{
-	//Check that window isn't a null pointer
-	if (this->window) {
-		return this->window->isOpen();
-	}
-	return false;
-}
-
-const bool Game::getEndGame() const
-{
-	return this->endGame;
-}
-
-
-void Game::silenceMusic()
-{
-	this->musicOST.pause();
-}
-
-void Game::onGameEnd() {
-
-	Save::updateHighscore(this->points,this->saveFilePath);
-
-	//Sounds
-	this->silenceMusic();
-	this->exitToStartMenu = false;
-	if (this->health <= 0) {
-
-		this->dyingSound.play();
-		//Death menu loop
-		while (!this->exitToStartMenu) {
-			this->update();
-			this->render();
-		}
-	}
-}
-
-void Game::update()
-{
-	this->pollEvents();
-
-	//Update mouse pos
-	if (!this->endGame)
-	{
-		this->updateMousePos();
-
-		this->updateUi();
-
-		this->updateSpeed();
-
-		this->updateEnemies();
-
-		this->moveHand();
-
-		this->deleteEnemy();
-
-	}
-	//Health check
-	if (this->health <= 0)
-	{
-		this->updateMousePos();
-		this->endGame = true;
-	}
-}
-
-void Game::render()
-{
-	/*
-		Renders game objects. First clear the last frame, then render obejcts, then display frame
-	*/
-	this->window->clear(sf::Color(135, 206, 250));
-	//Render Background first
-	this->window->draw(this->backGroundObj);
-
-	//Drawing game objects
-	this->renderRects(*this->window);
-	//
-	if (this->makeBloodSplatter) {
-		this->renderBlood(*this->window);
-	}
-	this->renderUi(*this->window);
-	if (this->health <= 0) {
-		this->renderDyingMessage(*this->window);
-	}
-	this->window->display();
-}

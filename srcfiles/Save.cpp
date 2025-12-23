@@ -4,43 +4,6 @@ unsigned int Save::highscore = 0;
 const std::string Save::fileName = "Data/Saves/Save.txt";
 const int Save::ENCRYPTIONKEY = 314159265;
 const int Save::SECONDENCRYPTIONKEY = 271828182;
-//Very Simple encryption. Won't be THAT easy to change Highscore
-std::string Save::encrypt(const int& highscore, const int& encryptionKey)
-{
-	int xorScore = highscore ^ encryptionKey;
-	std::string xorString = std::to_string(xorScore);
-	std::string encryptedScore = "";
-	for (char& chrNum : xorString)
-	{
-		int tempDigit = chrNum - '0';
-		char digChr = 91 + tempDigit;
-		encryptedScore += digChr;
-	}
-	return encryptedScore;
-}
-
-const int Save::decrypt(std::string& encryptedString, const int& encryptionKey)
-{
-
-	std::string xorString = "";
-	int decryptedScore = 0;
-	for (char encryptedChr : encryptedString)
-	{
-		int tempDigit = encryptedChr - 91;
-		char chrNum = tempDigit + '0';
-		xorString += chrNum;
-	}
-	try
-	{
-		decryptedScore = std::stoi(xorString);
-	}
-	catch (const std::exception&)
-	{
-	}
-	decryptedScore ^= encryptionKey;
-	return decryptedScore;
-}
-
 
 // Encryption variable in range 1 - 10
 unsigned int Save::getHighscore(const std::string& fileName)
@@ -110,3 +73,41 @@ void Save::updateHighscore(unsigned int newHighScore, const std::string& fileNam
 	outputFile << encryptedHighScore << std::endl;
 	outputFile << encryptedVerifiedScore << std::endl;
 }
+//Very Simple encryption. Won't be THAT easy to change Highscore
+std::string Save::encrypt(const int& highscore, const int& encryptionKey)
+{
+	int xorScore = highscore ^ encryptionKey;
+	std::string xorString = std::to_string(xorScore);
+	std::string encryptedScore = "";
+	for (char& chrNum : xorString)
+	{
+		int tempDigit = chrNum - '0';
+		char digChr = 91 + tempDigit;
+		encryptedScore += digChr;
+	}
+	return encryptedScore;
+}
+
+const int Save::decrypt(std::string& encryptedString, const int& encryptionKey)
+{
+
+	std::string xorString = "";
+	int decryptedScore = 0;
+	for (char encryptedChr : encryptedString)
+	{
+		int tempDigit = encryptedChr - 91;
+		char chrNum = tempDigit + '0';
+		xorString += chrNum;
+	}
+	try
+	{
+		decryptedScore = std::stoi(xorString);
+	}
+	catch (const std::exception&)
+	{
+	}
+	decryptedScore ^= encryptionKey;
+	return decryptedScore;
+}
+
+
