@@ -1,18 +1,13 @@
-#include "GameManager.h"
+#include "GameManager.hpp"
 #include <array>
 #include <utility>
 #include <tuple>
 
 GameManager::GameManager(int windowWidth_in, int windowHeight_in, sf::RenderWindow* window):
-	windowWidth(windowWidth_in), windowHeight(windowHeight_in), difficulty(0), isGameRunning(true)
+	windowWidth(windowWidth_in), windowHeight(windowHeight_in), difficulty(0)
 {
 	this->runStartMenu(this->windowWidth, this->windowHeight, window);
 
-}
-
-bool GameManager::Isrunning() const
-{
-    return this->isGameRunning;
 }
 
 void GameManager::changeResoluton(const short& resolution, sf::RenderWindow* window)
@@ -27,7 +22,6 @@ void GameManager::changeResoluton(const short& resolution, sf::RenderWindow* win
 
 void GameManager::runStartMenu(int windowWidth, int windowHeight, sf::RenderWindow* window)
 {
-	this->isGameRunning = true;
 	//std::unique_ptr<StartMenu> startMenu = std::make_unique<StartMenu>(windowWidth, windowHeight,window);
 	StartMenu* startMenu = new StartMenu(windowWidth, windowHeight, window);
 	while (startMenu->running() && !startMenu->getEndMenu())
@@ -50,12 +44,10 @@ void GameManager::runStartMenu(int windowWidth, int windowHeight, sf::RenderWind
 
 
 	this->runGame(this->difficulty, this->windowWidth, this->windowHeight, window);
-	this->isGameRunning = false;
 }
 
 void GameManager::runGame(const short& difficulty, const int& windowWidth,const int& windowHeight, sf::RenderWindow* window)
 {
-	this->isGameRunning = true;
 	//Can't use smartpointers here. They're not so smart afterall
 	Game* game = new Game(difficulty, windowWidth, windowHeight, window);
 	//PauseMenu* pauseMenu = new PauseMenu(window, windowWidth, windowHeight);
@@ -79,5 +71,4 @@ void GameManager::runGame(const short& difficulty, const int& windowWidth,const 
 	//After game ends we go back to menu
 	delete game;
 	this->runStartMenu(this->windowWidth, this->windowHeight, window);
-	this->isGameRunning = false;
 }

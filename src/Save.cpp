@@ -1,4 +1,4 @@
-#include "Save.h"
+#include "Save.hpp"
 #include "prints.cpp"
 unsigned int Save::highscore = 0;
 const std::string Save::fileName = "Data/Saves/Save.txt";

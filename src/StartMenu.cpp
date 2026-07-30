@@ -1,4 +1,4 @@
-#include "StartMenu.h"
+#include "StartMenu.hpp"
 
 void StartMenu::initWindow(sf::RenderWindow* window)
 {

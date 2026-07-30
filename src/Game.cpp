@@ -1,7 +1,7 @@
-#include "Game.h"
-#include "GameInitializer.h"
-#include "Save.h"
-#include "Enemy.h"
+#include "Game.hpp"
+#include "GameInitializer.hpp"
+#include "Save.hpp"
+#include "Enemy.hpp"
 #include <iostream>
 #include "prints.cpp"
 

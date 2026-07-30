@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <memory>
 
-#include "Enemy.h"
+#include "Enemy.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>

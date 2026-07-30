@@ -1,4 +1,4 @@
-#include "Enemy.h"
+#include "Enemy.hpp"
 #include <iostream>
 
 Enemy::Enemy(const sf::Texture& texture, const sf::Vector2f& position, int velocity, int offset)

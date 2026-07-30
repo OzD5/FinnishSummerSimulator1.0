@@ -1,4 +1,4 @@
-#include "GameInitializer.h"
+#include "GameInitializer.hpp"
 
 void GameInitializer::init(Game& game, sf::RenderWindow* mainWindow)
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Game.h"
-#include "Save.h"
+#include "Game.hpp"
+#include "Save.hpp"
 
 class GameInitializer
 {

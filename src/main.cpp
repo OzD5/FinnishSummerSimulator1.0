@@ -1,7 +1,7 @@
 #include <iostream>
-#include "StartMenu.h"
-#include "Game.h"
-#include "GameManager.h"
+#include "StartMenu.hpp"
+#include "Game.hpp"
+#include "GameManager.hpp"
 #include "prints.cpp"
 int main()
 {
