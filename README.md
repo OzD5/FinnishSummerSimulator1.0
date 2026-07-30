@@ -1,14 +1,14 @@
 2D-game about surviving the Finnish conditions. Made in C++ with the help of SFML library
 ### How to build v.1.1.0-alpha:
 1. clone the repository and run following commands. 
-'''
+```
 cmake -B build -S .
 cmake --build build
-'''
+```
 2. To run the game:
-'''
+```
 .\build\FinnishSummerSimulator.exe
-'''
+```
 3. Enjoy the Finnish summer :)
 
 Mainmenu:
