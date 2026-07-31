@@ -3,15 +3,18 @@
 #include "PauseMenu.hpp"
 #include "StartMenu.hpp"
 
+enum class GameChoice {Quit, RunStartMenu, RunGame};
 class GameManager
 {
 private:
 	int windowWidth;
 	int windowHeight;
+	sf::RenderWindow* window;
 	short difficulty;
-	void changeResoluton(const short& resolution, sf::RenderWindow* window);
-	void runStartMenu(int windowWidth, int windowHeight, sf::RenderWindow* window);
-	void runGame(const short& difficulty, const int& windowWidth, const int& windowHeight, sf::RenderWindow* window);
+	void changeResoluton(const short resolution);
+	GameChoice runStartMenu();
+	GameChoice runGame();
 public:
 	explicit GameManager(int windowWidth_in, int windowHeight_in, sf::RenderWindow* window);
+	void run();
 };

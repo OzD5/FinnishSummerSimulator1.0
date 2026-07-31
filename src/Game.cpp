@@ -1,36 +1,16 @@
+#include <cmath>
+#include <iostream>
+
 #include "Game.hpp"
 #include "GameInitializer.hpp"
 #include "Save.hpp"
 #include "Enemy.hpp"
-#include <iostream>
 #include "prints.cpp"
-
-#include <cmath>
 
 Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN, sf::RenderWindow* window)
 	: difficulty(difficultyIN)
 	, windowWidth(windowWidthIN)
 	, windowHeight(windowHeightIN)
-	, heightRatio(0.0f)
-	, widthRatio(0.0f)
-	, endGame(false)
-	, toPauseMenu(false)
-	, exitToStartMenu(false)
-	, highscore(0)
-	, points(0)
-	, enemySpawnTimer(0.0f)
-	, enemySpawnTimerMax(0.0f)
-	, maxEnemies(0)
-	, health(0)
-	, stamina(0)
-	, mouseHeld(false)
-	, isTouching(false)
-	, makeBloodSplatter(false)
-	, isStaminaRegen(false)
-	, speedX(0.0f)
-	, speedY(0.0f)
-	, mltplr(0)
-	, ev()
 	, window(window)
 {
 	GameInitializer::init(*this,window);
@@ -368,18 +348,17 @@ void Game::updateEnemyPosition(Enemy& enemy)
 
 float Game::calculateWaveX(float enemyY, int velocity, int offset) const
 {
-	using namespace std;
 	float angle;
 	float randomness = static_cast<float>(rand() % 100) / 100;
 	if (velocity % 2 == 0)
 	{
 		angle = (enemyY / 100.0f + offset) * 0.1f;
-		return (sin(sin(angle) * static_cast<float>(pow(cos(angle), 4)) + sin(0.5f * angle) * this->speedX * 0.1f) * sin(angle) * randomness) * this->widthRatio;
+		return (std::sin(std::sin(angle) * static_cast<float>(std::pow(std::cos(angle), 4)) + std::sin(0.5f * angle) * this->speedX * 0.1f) * std::sin(angle) * randomness) * this->widthRatio;
 	}
 	else
 	{
 		angle = (enemyY / 110.0f + offset) * 0.1f;
-		return (sin(angle * static_cast<float>(pow(cos(angle), 3)) + sin(angle) * this->speedX) * cos(angle) * randomness) * this->widthRatio;
+		return (std::sin(angle * static_cast<float>(std::pow(std::cos(angle), 3)) + std::sin(angle) * this->speedX) * std::cos(angle) * randomness) * this->widthRatio;
 	}
 }
 

@@ -20,7 +20,6 @@ class GameInitializer;
 class Game
 {
 public:
-	//construction / destruction
 	Game(short difficulty, unsigned windowWidth, unsigned windowHeight, sf::RenderWindow* window);
 	Game(const Game&) = delete;
 	Game& operator=(const Game&) = delete;
@@ -77,30 +76,30 @@ private:
 	unsigned windowHeight;
 	unsigned windowWidth;
 
-	float heightRatio;
-	float widthRatio;
+	float heightRatio = 0.0f;
+	float widthRatio = 0.0f;
 
-	bool toPauseMenu;
-	bool endGame;
-	bool exitToStartMenu;
-	unsigned int highscore;
-	unsigned int points;
+	bool toPauseMenu = false;
+	bool endGame = false;
+	bool exitToStartMenu = false;
+	unsigned int highscore = 0;
+	unsigned int points = 0;
 
-	float enemySpawnTimer;
-	float enemySpawnTimerMax;
-	int maxEnemies;
-	long long health;
-	unsigned int stamina;
+	float enemySpawnTimer = 0.0f;
+	float enemySpawnTimerMax = 0.0f;
+	int maxEnemies = 0;
+	long long health = 0;
+	unsigned int stamina = 0;
 
 
-	bool mouseHeld;
-	bool isTouching;
-	bool makeBloodSplatter;
-	bool isStaminaRegen;
+	bool mouseHeld = false;
+	bool isTouching = false;
+	bool makeBloodSplatter = false;
+	bool isStaminaRegen = false;
 	
-	float speedX;
-	float speedY;
-	unsigned int mltplr;
+	float speedX = 0.0f;
+	float speedY = 0.0f;
+	unsigned int mltplr = 0;
 
 	sf::Clock regenClock;
 

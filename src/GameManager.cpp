@@ -2,25 +2,41 @@
 #include <array>
 #include <utility>
 #include <tuple>
+#include <algorithm>
 
 GameManager::GameManager(int windowWidth_in, int windowHeight_in, sf::RenderWindow* window):
-	windowWidth(windowWidth_in), windowHeight(windowHeight_in), difficulty(0)
+	windowWidth(windowWidth_in), windowHeight(windowHeight_in), window(window), difficulty(0)
 {
-	this->runStartMenu(this->windowWidth, this->windowHeight, window);
 
 }
 
-void GameManager::changeResoluton(const short& resolution, sf::RenderWindow* window)
+void GameManager::run()
+{
+	using enum GameChoice;
+	GameChoice currentTask = RunStartMenu;
+	while (currentTask != Quit) {
+		if (currentTask == RunStartMenu) {
+			currentTask = runStartMenu();
+		}	
+		else {
+			currentTask = runGame();
+		}
+	}
+}
+
+void GameManager::changeResoluton(const short resolution)
 {
 	std::array<std::pair<int,int>, 3> windowSizes = {{{1280, 720}, {1920, 1080}, {2560, 1440}}};
 
-	std::tie(this->windowWidth, this->windowHeight) = windowSizes[resolution];
+	// Resolution is either 1, 2 or 3.
+	auto resolutionChoice = std::clamp(resolution - 1, 0, 2);
+	std::tie(this->windowWidth, this->windowHeight) = windowSizes[resolutionChoice];
 
 	delete window;
-	window = new sf::RenderWindow(sf::VideoMode(this->windowWidth, this->windowHeight), "Finnish Summer Simulator", sf::Style::Titlebar | sf::Style::Default);
+	this->window = new sf::RenderWindow(sf::VideoMode(this->windowWidth, this->windowHeight), "Finnish Summer Simulator", sf::Style::Titlebar | sf::Style::Default);
 }
 
-void GameManager::runStartMenu(int windowWidth, int windowHeight, sf::RenderWindow* window)
+GameChoice GameManager::runStartMenu()
 {
 	//std::unique_ptr<StartMenu> startMenu = std::make_unique<StartMenu>(windowWidth, windowHeight,window);
 	StartMenu* startMenu = new StartMenu(windowWidth, windowHeight, window);
@@ -34,25 +50,23 @@ void GameManager::runStartMenu(int windowWidth, int windowHeight, sf::RenderWind
 	if (!startMenu->getStartGame())
 	{
 		delete startMenu;
-		return;
+		return GameChoice::Quit;
 	}
 	this->difficulty = startMenu->getDifficulty();
 	short resolution = startMenu->getResolution();
 
-	changeResoluton(resolution, window);
+	changeResoluton(resolution);
 	delete startMenu;
 
-
-	this->runGame(this->difficulty, this->windowWidth, this->windowHeight, window);
+	return GameChoice::RunGame;
 }
 
-void GameManager::runGame(const short& difficulty, const int& windowWidth,const int& windowHeight, sf::RenderWindow* window)
+GameChoice GameManager::runGame()
 {
-	//Can't use smartpointers here. They're not so smart afterall
 	Game* game = new Game(difficulty, windowWidth, windowHeight, window);
 	//PauseMenu* pauseMenu = new PauseMenu(window, windowWidth, windowHeight);
 	//Game loop
-	while (game->running() && !game->getEndGame())
+	while (game->running() && !game->getEndGame() /* Only while pausemenu not implemented */&& !game->getPauseMenu())
 	{
 		if (!game->getPauseMenu()) {
 
@@ -70,5 +84,5 @@ void GameManager::runGame(const short& difficulty, const int& windowWidth,const 
 
 	//After game ends we go back to menu
 	delete game;
-	this->runStartMenu(this->windowWidth, this->windowHeight, window);
+	return GameChoice::RunStartMenu;
 }
