@@ -94,6 +94,14 @@ void GameInitializer::initUi(Game& game)
     initText(game, game.staminaText, "Stamina: ", 15,
         game.staminaBar.getPosition().x + game.staminaBar.getGlobalBounds().width + 20.f,
         game.staminaBar.getPosition().y);
+
+	game.deathMessage.setFont(game.font);
+	game.deathMessage.setString("You lost too much blood!\nPress enter to continue...");
+	game.deathMessage.setCharacterSize(100);
+	game.deathMessage.setOutlineColor(sf::Color::Black);
+	game.deathMessage.setOutlineThickness(2.f);
+	game.deathMessage.setFillColor(sf::Color::Red);
+	game.deathMessage.setPosition(sf::Vector2f(game.windowWidth / 2.f - game.deathMessage.getGlobalBounds().width/2, game.windowHeight / 2.f));
 }
 
 void GameInitializer::initText(Game& game, sf::Text& textObj, std::string text, int size, float x, float y)

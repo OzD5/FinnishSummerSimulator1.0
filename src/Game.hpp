@@ -49,6 +49,7 @@ private:
 
 	sf::Text healthText;
 	sf::Text staminaText;
+	sf::Text deathMessage;
 	sf::RectangleShape healthBar;
 	sf::RectangleShape staminaBar;
 
@@ -87,7 +88,7 @@ private:
 
 	float enemySpawnTimer = 0.0f;
 	float enemySpawnTimerMax = 0.0f;
-	int maxEnemies = 0;
+	std::size_t maxEnemies = 0;
 	long long health = 0;
 	unsigned int stamina = 0;
 

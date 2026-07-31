@@ -1,5 +1,8 @@
 #include <cmath>
 #include <iostream>
+#include <random>
+#include <format>
+#include <algorithm>
 
 #include "Game.hpp"
 #include "GameInitializer.hpp"
@@ -23,277 +26,244 @@ Game::~Game()
 
 bool Game::running() const
 {
-	if (this->window) {
-		return this->window->isOpen();
-	}
-	return false;
+	return window && window->isOpen();
 }
 
 bool Game::getEndGame() const
 {
-	return this->endGame;
+	return endGame;
 }
 
 bool Game::getPauseMenu() const
 {
-	return this->toPauseMenu;
+	return toPauseMenu;
 }
 
 
 void Game::silenceMusic()
 {
-	this->musicOST.pause();
+	musicOST.pause();
 }
 
 void Game::onGameEnd() {
 
-	Save::updateHighscore(this->points,this->saveFilePath);
+	Save::updateHighscore(points, saveFilePath);
 
-	this->silenceMusic();
-	this->exitToStartMenu = false;
-	if (this->health <= 0) {
+	silenceMusic();
+	exitToStartMenu = false;
+	if (health <= 0) {
 
-		this->dyingSound.play();
+		dyingSound.play();
 		//Death menu loop
-		while (!this->exitToStartMenu) {
-			this->update();
-			this->render();
+		while (!exitToStartMenu) {
+			update();
+			render();
 		}
 	}
 }
-
 void Game::update()
 {
-	this->pollEvents();
-	this->updateMousePos();
+    pollEvents();
+    updateMousePos();
 
-	if (!this->endGame)
-	{
+    if (!endGame) {
+        updateUi();
+        updateSpeed();
+        updateEnemies();
+        moveHand();
+        deleteEnemy();
+    }
 
-		this->updateUi();
-
-		this->updateSpeed();
-
-		this->updateEnemies();
-
-		this->moveHand();
-
-		this->deleteEnemy();
-
-	}
-	//Health check
-	if (this->health <= 0)
-	{
-		this->endGame = true;
-	}
+    if (health <= 0) {
+        endGame = true;
+    }
 }
 
 void Game::render()
 {
-	/*
-		Renders game objects. First clear the last frame, then render obejcts, then display frame
-	*/
-	this->window->clear(sf::Color(135, 206, 250));
-	//Render Background first
-	this->window->draw(this->backGroundObj);
+    // Renders game objects. First clear the last frame, then render objects, then display frame
+    window->clear(sf::Color(135, 206, 250));
+    window->draw(backGroundObj);
+    renderRects(*window);
 
-	//Drawing game objects
-	this->renderRects(*this->window);
-	//
-	if (this->makeBloodSplatter) {
-		this->renderBlood(*this->window);
-	}
-	this->renderUi(*this->window);
-	if (this->health <= 0) {
-		this->renderDyingMessage(*this->window);
-	}
-	this->window->display();
+    if (makeBloodSplatter) {
+        renderBlood(*window);
+    }
+    renderUi(*window);
+
+    if (health <= 0) {
+        renderDyingMessage(*window);
+    }
+    window->display();
 }
-
-
 
 void Game::spawnEnemy()
 {
-	// Spawn enemies with random type, and random velocity
-	int type = (rand() % 7);
+    static const std::array<sf::Vector2f, 7> enemySizes = {
+        sf::Vector2f(75.f, 95.f),
+        sf::Vector2f(70.f, 70.f),
+        sf::Vector2f(45.f, 90.f),
+        sf::Vector2f(50.f, 85.f),
+        sf::Vector2f(85.f, 50.f),
+        sf::Vector2f(65.f, 30.f),
+        sf::Vector2f(55.f, 30.f)
+    };
 
-	//Half of mosquitos look right and half look left
-	sf::Texture* mosquitoPic = (rand() % 2 == 1) ? mosquitoPic = &this->mosquitoL : &this->mosquitoR;
-	//Creating new enemy
-	Enemy newEnemy(*mosquitoPic, sf::Vector2f(static_cast<float>(rand() % (static_cast<int>(this->window->getSize().x - 50.f)) + 50.f),
-		0.f), /*Speed can't be zero*/std::max(type, 1), (rand() % 100) * 10);
+    static std::mt19937 rng{std::random_device{}()};
+    std::uniform_int_distribution<int> typeDist(0, 6);
+    std::uniform_int_distribution<int> coinFlip(0, 1);
+    std::uniform_int_distribution<int> speedDist(0, 99);
 
+    const int type = typeDist(rng);
+    const sf::Texture& mosquitoPic = coinFlip(rng) ? mosquitoL : mosquitoR;
 
-	sf::Vector2f enemySizes[7] = {
-		sf::Vector2f(75.f, 95.f), 
-		sf::Vector2f(70.f, 70.f), 
-		sf::Vector2f(45.f, 90.f),
-		sf::Vector2f(50.f, 85.f),
-		sf::Vector2f(85.f, 50.f), 
-		sf::Vector2f(65.f, 30.f), 
-		sf::Vector2f(55.f, 30.f)
-	};
-	
-	newEnemy.setSize(sf::Vector2f(0.003f * this->heightRatio * enemySizes[type].x, 0.003f * this->heightRatio * enemySizes[type].y));
+    const float spawnWidth = static_cast<float>(window->getSize().x) - 50.f;
+    const float spawnX = std::uniform_real_distribution<float>(50.f, spawnWidth)(rng);
 
-	this->enemies.push_back(newEnemy);
-	
+    Enemy& newEnemy = enemies.emplace_back(
+        mosquitoPic,
+        sf::Vector2f(spawnX, 0.f),
+        std::max(type, 1),   // speed can't be zero
+        speedDist(rng) * 10
+    );
+
+    newEnemy.setSize(sf::Vector2f(
+        0.003f * heightRatio * enemySizes[type].x,
+        0.003f * heightRatio * enemySizes[type].y
+    ));
 }
+
 void Game::pollEvents()
 {
-	while (this->window->pollEvent(this->ev))
-	{
-		switch (this->ev.type)
-		{
-		case sf::Event::Closed:
-			this->window->close();
-			break;
-
-		case sf::Event::KeyPressed:
-			if (this->ev.key.code == sf::Keyboard::Escape) {
-				this->toPauseMenu = true;
-			}
-			else if (this->ev.key.code == sf::Keyboard::Enter) {
-				this->exitToStartMenu = true;
-			}
-			break;
-		}
-	}
+    while (window->pollEvent(ev))
+    {
+        switch (ev.type)
+        {
+        case sf::Event::Closed:
+            window->close();
+            break;
+        case sf::Event::KeyPressed:
+            if (ev.key.code == sf::Keyboard::Escape) {
+                toPauseMenu = true;
+            } else if (ev.key.code == sf::Keyboard::Enter) {
+                exitToStartMenu = true;
+            }
+            break;
+        }
+    }
 }
 
 void Game::updateMousePos() {
-	this->mousePosWindow = sf::Mouse::getPosition(*this->window);
-	this->mousePosView = this->window->mapPixelToCoords(this->mousePosWindow);
+	mousePosWindow = sf::Mouse::getPosition(*window);
+	mousePosView = window->mapPixelToCoords(mousePosWindow);
 }
 
 void Game::updateUi()
 {
-	//UI scores
-	if (this->points > this->highscore) this->highscore = this->points;
+    // UI scores
+    if (points > highscore) highscore = points;
+    scoreText.setString(std::format("Highscore: {}\nPoints: {}\n", highscore, points));
 
-	std::stringstream scoreString;
-	scoreString << "Highscore: " << this->highscore << "\n"
-		<< "Points: " << this->points << "\n";
-	this->scoreText.setString(scoreString.str());
+    // Health
+    healthBar.setSize(health < 2000
+        ? sf::Vector2f(200.f * health / 1000.f, 20.f)
+        : sf::Vector2f(200.f, 20.f));
 
-	//Health
-	if (this->health < 2000) this->healthBar.setSize(sf::Vector2f(200.f * this->health / 1000, 20.f));
-	else this->healthBar.setSize(sf::Vector2f(200.f, 20.f));
-	
-	std::stringstream healthString;
-	healthString << "Health: " << this->health;
-	this->healthText.setString(healthString.str());
+    healthText.setString(std::format("Health: {}", health));
 
+    // Stamina
+    const unsigned curStamina = stamina;
+    staminaText.setString(std::format("Stamina: {}", curStamina));
 
-
-	//Stamina
-	unsigned curStamina = this->stamina;
-	std::stringstream staminaString;
-	staminaString << "Stamina: " << curStamina;
-	this->staminaText.setString(staminaString.str());
-
-
-	//Stamina bar logic
-	if (curStamina < 199.f && !isStaminaRegen)
-	{
-		this->regenClock.restart();
-		isStaminaRegen = true;
-	}
-	if (this->regenClock.getElapsedTime().asSeconds() >= 1 && curStamina < 199.f)
-	{
-		this->regenClock.restart();
-		this->staminaBar.setSize(sf::Vector2f(curStamina + 25.f, 20.f));
-		this->stamina += 25;
-	}
+    // Stamina bar regen logic
+    if (curStamina < 199 && !isStaminaRegen) {
+        regenClock.restart();
+        isStaminaRegen = true;
+    }
+    if (curStamina < 199 && regenClock.getElapsedTime().asSeconds() >= 1.f) {
+        regenClock.restart();
+        staminaBar.setSize(sf::Vector2f(static_cast<float>(curStamina) + 25.f, 20.f));
+        stamina += 25;
+    }
 }
-
 void Game::updateSpeed()
 {
-	//If not enough points, no need to update
-	if (this->points <= 25 * mltplr) return;
+    // If not enough points, no need to update
+    if (points <= 25 * mltplr) return;
 
-	if (this->speedY < 2)
-		this->speedY *= 1.01f;
-	else if (this->speedY < 2.5)
-		this->speedY += 0.02f;
-	this->mltplr++;
+    if (speedY < 2.f)
+        speedY *= 1.01f;
+    else if (speedY < 2.5f)
+        speedY += 0.02f;
+
+    ++mltplr;
 }
-
 void Game::deleteEnemy()
 {
-	//If player hasn't pressed a button we just return and change the mouseheld var to false. 
-	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		this->mouseHeld = false;
-		return;
-	}
-	//If mouse is held, we return
-	if (this->mouseHeld)
-	{
-		return;
-	}
+    // If the player isn't holding the mouse, reset the held flag and bail.
+    if (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        mouseHeld = false;
+        return;
+    }
+    // Ignore held-down mouse — only react on the initial press.
+    if (mouseHeld) {
+        return;
+    }
+    mouseHeld = true;
 
-	this->mouseHeld = true;
-	bool deleted = false;
-	bool hitSkin = false;
-	sf::Vector2f bitemarkCoords;
-	for (size_t i = 0; i < this->enemies.size() && deleted == false; i++)
-	{
-		//Check if you hit enemy and that there's enough stamina
-		bool enemyOnHand = mosquitoOnHand(enemies[i]);
+    bool hitSkin = false;
+    sf::Vector2f bitemarkCoords;
 
-		//If we havent hit the enemy we continue. Also if we hit but we dont have stamina and the enemy not in hand we continue
-		if (!this->enemies[i].getGlobalBounds().contains(this->mousePosView) ||
-			!(this->stamina > 0 || enemyOnHand))
-			continue;
+    auto hitIt = std::find_if(enemies.begin(), enemies.end(), [this](const Enemy& enemy) {
+        const bool enemyOnHand = mosquitoOnHand(enemy);
+        return enemy.getGlobalBounds().contains(mousePosView) && (stamina > 0 || enemyOnHand);
+    });
 
-		//Getting points based on difficulty of enemy. If enemy is already on hand we give 1 point only
-		int scoreAmount = this->enemies[i].getVelocity();
-		if (!enemyOnHand)
-		{
-			this->points += static_cast<int>(2.5 * scoreAmount) + 5;
-		}
-		else
-		{
-			this->points += 1;
-			hitSkin = true;
-			bitemarkCoords = this->enemies[i].getPosition();
-		}
-		//delete enemy and break loop so that we dont iterate more because we found our target and because our vector changes.
-		deleted = true;
-		this->enemies.erase(this->enemies.begin() + i);
-		break;
-	}
-	// If we hit enemy in air
-	if (deleted && !hitSkin) {
-		this->hittingInsectSound.play();
-		return;
-	}
-	//If we have stamina and we hit mosquito on skin
-	if (this->stamina > 0 && hitSkin) {
-		this->health -= 10;
-		this->makeBloodSplatter = true;
-		this->bloodClock.restart();
+    const bool deleted = (hitIt != enemies.end());
 
-		this->hittingHandSound.play();
-		//Making bitemark
-		sf::Sprite newBitemark(this->bloodBitemark);
-		newBitemark.setPosition(bitemarkCoords);
-		newBitemark.setScale(sf::Vector2f(this->heightRatio, this->heightRatio));
-		this->bitemarks.push_back(newBitemark);
-		
+    if (deleted) {
+        const bool enemyOnHand = mosquitoOnHand(*hitIt);
+        const int scoreAmount = hitIt->getVelocity();
 
-	} //If we have stamina and we didnt hit mosquito
-	else if (this->stamina > 0 && !hitSkin) {
-		this->isStaminaRegen = false;
-		this->staminaBar.setSize(sf::Vector2f(staminaBar.getSize().x - 25.f, 20.f));
-		this->stamina -= 25;
+        if (!enemyOnHand) {
+            points += static_cast<int>(2.5 * scoreAmount) + 5;
+        } else {
+            points += 1;
+            hitSkin = true;
+            bitemarkCoords = hitIt->getPosition();
+        }
+        enemies.erase(hitIt);
+    }
 
-		if (this->hairyHand.getGlobalBounds().contains(this->mousePosView))
-			this->hittingHandSound.play();
-		else
-			this->swingingAirSound.play();
-	}
+    // Hit enemy mid-air
+    if (deleted && !hitSkin) {
+        hittingInsectSound.play();
+        return;
+    }
+
+    // Hit mosquito on skin, and had stamina to do it
+    if (stamina > 0 && hitSkin) {
+        health -= 10;
+        makeBloodSplatter = true;
+        bloodClock.restart();
+        hittingHandSound.play();
+
+        sf::Sprite newBitemark(bloodBitemark);
+        newBitemark.setPosition(bitemarkCoords);
+        newBitemark.setScale(sf::Vector2f(heightRatio, heightRatio));
+        bitemarks.push_back(newBitemark);
+    }
+    // Had stamina, but missed
+    else if (stamina > 0 && !hitSkin) {
+        isStaminaRegen = false;
+        staminaBar.setSize(sf::Vector2f(staminaBar.getSize().x - 25.f, 20.f));
+        stamina -= 25;
+
+        if (hairyHand.getGlobalBounds().contains(mousePosView))
+            hittingHandSound.play();
+        else
+            swingingAirSound.play();
+    }
 }
 
 const bool Game::mosquitoOnHand(const Enemy& enemy) const
@@ -304,27 +274,26 @@ const bool Game::mosquitoOnHand(const Enemy& enemy) const
 void Game::updateEnemies()
 {
 	// Check if there's room for more enemies and spawn if necessary
-	if (this->enemies.size() < static_cast<size_t>(this->maxEnemies))
+	if (enemies.size() < maxEnemies)
 	{
-		if (this->enemySpawnTimer < this->enemySpawnTimerMax)
+		if (enemySpawnTimer < enemySpawnTimerMax)
 		{
-			this->enemySpawnTimer += 1.f;
+			enemySpawnTimer += 1.f;
 		}
 		else
 		{
-			this->spawnEnemy();
-			this->enemySpawnTimer = 0.f;
+			spawnEnemy();
+			enemySpawnTimer = 0.f;
 		}
 	}
 
 	// Moving and updating enemies
-	for (size_t i = 0; i < this->enemies.size(); i++)
-	{
-		updateEnemyPosition(this->enemies[i]);
-		checkEnemyBounds(this->enemies[i]);
-	}
+	std::ranges::for_each(enemies, [this](Enemy& enemy) {
+		updateEnemyPosition(enemy);
+		checkEnemyBounds(enemy);
+	});
 
-	this->isTouching = false;
+	isTouching = false;
 }
 
 void Game::updateEnemyPosition(Enemy& enemy)
@@ -335,14 +304,14 @@ void Game::updateEnemyPosition(Enemy& enemy)
 	{
 		//If enemy not on hand yet we calculate the trajectory and move it
 		float waveX = calculateWaveX(enemyY, enemy.getVelocity(), enemy.getOffset());
-		enemy.move(waveX + (2 * (rand() % 2) - 1) * 0.2f, this->speedY);
+		enemy.move(waveX + (2 * (rand() % 2) - 1) * 0.2f, speedY);
 		return;
 	}
 	//If enemy already on hand we take health away
-	this->isTouching = true;
+	isTouching = true;
 	if (static_cast<int>(rand() % 10) == 0)
 	{
-		this->health -= 1;
+		health -= 1;
 	}
 }
 
@@ -361,18 +330,17 @@ float Game::calculateWaveX(float enemyY, int velocity, int offset) const
 		return (std::sin(angle * static_cast<float>(std::pow(std::cos(angle), 3)) + std::sin(angle) * this->speedX) * std::cos(angle) * randomness) * this->widthRatio;
 	}
 }
-
 void Game::checkEnemyBounds(Enemy& enemy)
 {
-	while (enemy.getPosition().x + enemy.getSize().x >= this->window->getSize().x) {
-		enemy.move(-1.0f, 0);
-	}
-	while (enemy.getPosition().x < 0)
-	{
-		enemy.move(1.0f, 0);
-	}
-}
+    const float rightEdge = static_cast<float>(window->getSize().x) - enemy.getSize().x;
+    const sf::Vector2f pos = enemy.getPosition();
 
+    if (pos.x > rightEdge) {
+        enemy.move(rightEdge - pos.x, 0.f);
+    } else if (pos.x < 0.f) {
+        enemy.move(-pos.x, 0.f);
+    }
+}
 
 void Game::moveHand()
 {
@@ -427,15 +395,6 @@ void Game::renderRects(sf::RenderTarget& target)
 
 void Game::renderDyingMessage(sf::RenderTarget& target) const
 {
-	sf::Text message;
-	message.setFont(this->font);
-	message.setString("You lost too much blood!\nPress enter to continue...");
-	message.setCharacterSize(100);
-	message.setOutlineColor(sf::Color::Black);
-	message.setOutlineThickness(2.f);
-	message.setFillColor(sf::Color::Red);
-	message.setPosition(sf::Vector2f(this->windowWidth / 2.f - message.getGlobalBounds().width/2, this->windowHeight / 2.f));
-	this->window->draw(message);
-
+    target.draw(deathMessage);
 }
 
