@@ -230,7 +230,11 @@ void Game::deleteEnemy()
         } else {
             points += 1;
             hitSkin = true;
-            bitemarkCoords = hitIt->getPosition();
+            sf::FloatRect hitBounds = hitIt->getGlobalBounds();
+
+            bitemarkCoords.x = hitBounds.left + hitBounds.width / 2.0f; 
+            bitemarkCoords.y = hitBounds.top + hitBounds.height / 2.0f;
+
         }
         enemies.erase(hitIt);
     }
@@ -248,10 +252,13 @@ void Game::deleteEnemy()
         bloodClock.restart();
         hittingHandSound.play();
 
-        sf::Sprite newBitemark(bloodBitemark);
+        sf::Sprite& newBitemark = bitemarks.emplace_back(sf::Sprite(bloodBitemark));
+        newBitemark.setScale(sf::Vector2f(heightRatio * 0.4f, heightRatio * 0.4f));
+
+        sf::FloatRect bounds = newBitemark.getGlobalBounds();
+        bitemarkCoords = sf::Vector2f(bitemarkCoords.x - bounds.width/ 2, bitemarkCoords.y - bounds.height/ 2);
         newBitemark.setPosition(bitemarkCoords);
-        newBitemark.setScale(sf::Vector2f(heightRatio, heightRatio));
-        bitemarks.push_back(newBitemark);
+        newBitemark.setColor(sf::Color(255, 255, 255, 128)); 
     }
     // Had stamina, but missed
     else if (stamina > 0 && !hitSkin) {
