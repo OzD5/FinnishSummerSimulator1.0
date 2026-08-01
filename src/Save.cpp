@@ -2,8 +2,8 @@
 #include "prints.cpp"
 unsigned int Save::highscore = 0;
 const std::string Save::fileName = "Data/Saves/Save.txt";
-const int Save::ENCRYPTIONKEY = 314159265;
-const int Save::SECONDENCRYPTIONKEY = 271828182;
+const int Save::ENCRYPTIONKEY = 318460538;
+const int Save::SECONDENCRYPTIONKEY = 754683156;
 
 // Encryption variable in range 1 - 10
 unsigned int Save::getHighscore(const std::string& fileName)
@@ -17,7 +17,7 @@ unsigned int Save::getHighscore(const std::string& fileName)
 		temp.close();
 	}
 
-	unsigned int checkSum = 0;
+	int checkSum = 0;
 	bool zeroth = false;
 	bool firstScore = false;
 	bool secondScore = false;

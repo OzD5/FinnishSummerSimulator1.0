@@ -1,25 +1,114 @@
 #include "StartMenu.hpp"
 
+
+void StartMenu::update()
+{
+	if (!endMenu)
+	{
+		pollEvents();
+		updateMousePos();
+		checkPress();
+	}
+}
+
+void StartMenu::renderButtons(sf::RenderTarget& target)
+{
+	target.draw(startButton);
+	target.draw(difficultyButton);
+	target.draw(resolutionButton);
+	target.draw(exitButton);
+
+	target.draw(startText);
+	target.draw(difficultyText);
+	target.draw(resolutionText);
+	target.draw(exitText);
+	
+}
+
+void StartMenu::render()
+{
+	startwindow->clear(sf::Color(0, 20, 255));
+
+	startwindow->draw(backGround);
+
+	renderButtons(*startwindow);
+
+	startwindow->display();
+}
+
+void StartMenu::updateMousePos()
+{
+	mousePosWindow = sf::Mouse::getPosition(*startwindow);
+	mousePosView = startwindow->mapPixelToCoords(mousePosWindow);
+}
+
+void StartMenu::silenceMusic()
+{
+	mainMenuMusic.pause();
+}
+
+short StartMenu::getResolution() const
+{
+	return resolution;
+}
+
+short StartMenu::getDifficulty() const
+{
+	return difficulty;
+}
+
+bool StartMenu::getEndMenu() const
+{
+	return endMenu;
+}
+
+bool StartMenu::getStartGame() const
+{
+	return startGame;
+}
+
+const bool StartMenu::running() const
+{
+	if (startwindow) {
+		return startwindow->isOpen();
+	}
+	return false;
+}
+
+StartMenu::StartMenu(unsigned width, unsigned height, sf::RenderWindow* window)
+{
+	windowWidth = width;
+	windowHeight = height;
+	initVariables();
+	initWindow(window);
+	initUI();
+	initSound();
+}
+
+StartMenu::~StartMenu()
+{
+}
+
 void StartMenu::initWindow(sf::RenderWindow* window)
 {
-	this->videoMode.height = this->windowHeight;
-	this->videoMode.width = this->windowWidth;
-	this->windowRatio = this->windowWidth / 1920.f;
+	videoMode.height = windowHeight;
+	videoMode.width = windowWidth;
+	windowRatio = windowWidth / 1920.f;
 
 	//Dynamically creating new window.
-	this->startwindow = window;
-	this->startwindow->setFramerateLimit(60);
+	startwindow = window;
+	startwindow->setFramerateLimit(60);
 }
 
 void StartMenu::initVariables()
 {
-	this->startwindow = nullptr;
+	startwindow = nullptr;
 
-	this->difficulty = 1;
-	this->mouseHold = false;
-	this->endMenu = false;
-	this->startGame = false;
-	this->resolution = 2;
+	difficulty = 1;
+	mouseHold = false;
+	endMenu = false;
+	startGame = false;
+	resolution = 2;
 }
 
 void StartMenu::initUI()
@@ -31,12 +120,12 @@ void StartMenu::initUI()
 		std::cerr << "STARTMENU::INITUNI::RECOURCES NOT LOADED" << std::endl;
 	}
 
-	this->backGround.setTexture(this->backGroundFile);
-	this->backGround.setPosition(0, 0);
-	this->backGround.setScale(sf::Vector2f(windowRatio, windowRatio));
+	backGround.setTexture(backGroundFile);
+	backGround.setPosition(0, 0);
+	backGround.setScale(sf::Vector2f(windowRatio, windowRatio));
 
-	float centerWidth = static_cast<float>(this->windowWidth / 2);
-	float centerHeight = static_cast<float>(this->windowHeight / 2);
+	float centerWidth = static_cast<float>(windowWidth / 2);
+	float centerHeight = static_cast<float>(windowHeight / 2);
 
 	setupButton(startButton, centerWidth, centerHeight);
 	setupButton(difficultyButton, centerWidth, centerHeight + 100.f*windowRatio);
@@ -44,10 +133,10 @@ void StartMenu::initUI()
 	setupButton(exitButton, centerWidth, centerHeight + 300.f*windowRatio);
 
 	//TODO RESOLUTION CHANGE NOT WORKING PROPERLY
-	setupText(this->startText, "Begin journey", startButton.getPosition().x, startButton.getPosition().y);
-	setupText(this->difficultyText, "Level 1", difficultyButton.getPosition().x, difficultyButton.getPosition().y);
-	setupText(this->resolutionText, "1080p", resolutionButton.getPosition().x, resolutionButton.getPosition().y);
-	setupText(this->exitText, "Exit game", exitButton.getPosition().x, exitButton.getPosition().y);
+	setupText(startText, "Begin journey", startButton.getPosition().x, startButton.getPosition().y);
+	setupText(difficultyText, "Level 1", difficultyButton.getPosition().x, difficultyButton.getPosition().y);
+	setupText(resolutionText, "1080p", resolutionButton.getPosition().x, resolutionButton.getPosition().y);
+	setupText(exitText, "Exit game", exitButton.getPosition().x, exitButton.getPosition().y);
 
 
 }
@@ -73,28 +162,31 @@ void StartMenu::setupText(sf::Text& buttonText, const std::string& text, float x
 	buttonText.setFillColor(sf::Color::White);
 	buttonText.setOutlineColor(sf::Color::Black);
 	buttonText.setString(text);
-	buttonText.setPosition(sf::Vector2f(x + this->exitButton.getGlobalBounds().width/2 - buttonText.getGlobalBounds().width/2, y + 12.f*windowRatio));
+	buttonText.setPosition(
+		sf::Vector2f(x + exitButton.getGlobalBounds().width/2 
+		- buttonText.getGlobalBounds().width/2, y + 12.f*windowRatio)
+	);
 }
 
 
 void StartMenu::initSound()
 {
-	if (!(this->mainMenuMusic).openFromFile("Data/Sounds/mainMenuOST.wav"))
+	if (!(mainMenuMusic).openFromFile("Data/Sounds/mainMenuOST.wav"))
 	{
 		std::cout << "STARTMENU::INITSOUND::MAINMENUOST.WAW NOT FOUND";
 	}
-	this->mainMenuMusic.setLoop(true);
-	this->mainMenuMusic.setVolume(14);
-	this->mainMenuMusic.play();
+	mainMenuMusic.setLoop(true);
+	mainMenuMusic.setVolume(14);
+	mainMenuMusic.play();
 }
 
 void StartMenu::pollEvents()
 {
-	while (this->startwindow->pollEvent(this->eve))
+	while (startwindow->pollEvent(eve))
 	{
-		if (this->eve.type == sf::Event::Closed)
+		if (eve.type == sf::Event::Closed)
 		{
-			this->startwindow->close();
+			startwindow->close();
 			break;
 		}
 		/*else if (this->eve.type == sf::Event::MouseButtonPressed)
@@ -112,173 +204,84 @@ void StartMenu::checkPress()
 {
 	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
-		this->mouseHold = false;
+		mouseHold = false;
 		return;
 	}
-	if (this->mouseHold)
+	if (mouseHold)
 		return;
-	this->mouseHold = true;
-	if (this->startButton.getGlobalBounds().contains(this->mousePosView))
+	mouseHold = true;
+	if (startButton.getGlobalBounds().contains(mousePosView))
 	{
-		this->endMenu = true;
-		this->startGame = true;
+		endMenu = true;
+		startGame = true;
 	}
-	else if (this->difficultyButton.getGlobalBounds().contains(this->mousePosView))
+	else if (difficultyButton.getGlobalBounds().contains(mousePosView))
 	{
 		updateDifficulty();
 	}
-	else if (this->resolutionButton.getGlobalBounds().contains(this->mousePosView))
+	else if (resolutionButton.getGlobalBounds().contains(mousePosView))
 	{
 		updateResolution();
 	}
-	else if (this->exitButton.getGlobalBounds().contains(this->mousePosView))
+	else if (exitButton.getGlobalBounds().contains(mousePosView))
 	{
-		this->endMenu = true;
+		endMenu = true;
 	}
 }
 
 void StartMenu::updateDifficulty()
 {
-	if (this->difficulty >= 4) {
-		this->difficulty = 1;
+	if (difficulty >= 4) {
+		difficulty = 1;
 	}
 	else {
-		this->difficulty++;
+		difficulty++;
 	}
 	switch (difficulty)
 	{
 	case 1:
-		this->difficultyText.setString("Level 1");
+		difficultyText.setString("Level 1");
 		break;
 	case 2:
-		this->difficultyText.setString("Level 2");
+		difficultyText.setString("Level 2");
 		break;
 	case 3:
-		this->difficultyText.setString("Level 3");
+		difficultyText.setString("Level 3");
 		break;
 	case 4:
-		this->difficultyText.setString("Level 4");
+		difficultyText.setString("Level 4");
 		break;
 	}
 	//Centering the text
-	this->difficultyText.setPosition(sf::Vector2f(
-		difficultyButton.getPosition().x + this->exitButton.getGlobalBounds().width / 2 - difficultyText.getGlobalBounds().width / 2
+	difficultyText.setPosition(sf::Vector2f(
+		difficultyButton.getPosition().x + exitButton.getGlobalBounds().width / 2 - difficultyText.getGlobalBounds().width / 2
 		, difficultyButton.getPosition().y + 12.f));
 }
 
 void StartMenu::updateResolution()
 {
-	if (this->resolution >= 3) {
-		this->resolution = 1;
+	if (resolution >= 3) {
+		resolution = 1;
 	}
 	else {
-		this->resolution++;
+		resolution++;
 	}
 	switch (resolution)
 	{
 	case 1:
-		this->resolutionText.setString("720p");
+		resolutionText.setString("720p");
 		break;
 	case 2:
-		this->resolutionText.setString("1080p");
+		resolutionText.setString("1080p");
 		break;
 	case 3:
-		this->resolutionText.setString("1440p");
+		resolutionText.setString("1440p");
 		break;
 	default:
 		break;
 	}
 	//Centering the text
-	this->resolutionText.setPosition(sf::Vector2f(
-		resolutionButton.getPosition().x + this->resolutionButton.getGlobalBounds().width / 2 - resolutionText.getGlobalBounds().width / 2
+	resolutionText.setPosition(sf::Vector2f(
+		resolutionButton.getPosition().x + resolutionButton.getGlobalBounds().width / 2 - resolutionText.getGlobalBounds().width / 2
 		, resolutionButton.getPosition().y + 12.f));
-}
-
-
-void StartMenu::update()
-{
-	if (!this->endMenu)
-	{
-		this->pollEvents();
-		this->updateMousePos();
-		this->checkPress();
-	}
-}
-
-void StartMenu::renderButtons(sf::RenderTarget& target)
-{
-	target.draw(startButton);
-	target.draw(difficultyButton);
-	target.draw(resolutionButton);
-	target.draw(exitButton);
-
-	target.draw(startText);
-	target.draw(difficultyText);
-	target.draw(resolutionText);
-	target.draw(exitText);
-	
-}
-
-void StartMenu::render()
-{
-	this->startwindow->clear(sf::Color(0, 20, 255));
-
-	this->startwindow->draw(this->backGround);
-
-	this->renderButtons(*this->startwindow);
-
-	this->startwindow->display();
-}
-
-void StartMenu::updateMousePos()
-{
-	this->mousePosWindow = sf::Mouse::getPosition(*this->startwindow);
-	this->mousePosView = this->startwindow->mapPixelToCoords(this->mousePosWindow);
-}
-
-void StartMenu::silenceMusic()
-{
-	this->mainMenuMusic.pause();
-}
-
-short StartMenu::getResolution() const
-{
-	return this->resolution;
-}
-
-short StartMenu::getDifficulty() const
-{
-	return this->difficulty;
-}
-
-bool StartMenu::getEndMenu() const
-{
-	return this->endMenu;
-}
-
-bool StartMenu::getStartGame() const
-{
-	return this->startGame;
-}
-
-const bool StartMenu::running() const
-{
-	if (this->startwindow) {
-		return this->startwindow->isOpen();
-	}
-	return false;
-}
-
-StartMenu::StartMenu(unsigned width, unsigned height, sf::RenderWindow* window)
-{
-	this->windowWidth = width;
-	this->windowHeight = height;
-	this->initVariables();
-	this->initWindow(window);
-	this->initUI();
-	this->initSound();
-}
-
-StartMenu::~StartMenu()
-{
 }

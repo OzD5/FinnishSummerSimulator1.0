@@ -16,12 +16,12 @@ Game::Game(short difficultyIN, unsigned windowWidthIN, unsigned windowHeightIN, 
 	, windowHeight(windowHeightIN)
 	, window(window)
 {
-	GameInitializer::init(*this,window);
+	GameInitializer::init(*this, window);
 }
 
 Game::~Game()
 {
-	Save::updateHighscore(this->points,this->saveFilePath);
+	Save::updateHighscore(points, saveFilePath);
 }
 
 bool Game::running() const
@@ -322,12 +322,14 @@ float Game::calculateWaveX(float enemyY, int velocity, int offset) const
 	if (velocity % 2 == 0)
 	{
 		angle = (enemyY / 100.0f + offset) * 0.1f;
-		return (std::sin(std::sin(angle) * static_cast<float>(std::pow(std::cos(angle), 4)) + std::sin(0.5f * angle) * this->speedX * 0.1f) * std::sin(angle) * randomness) * this->widthRatio;
+		return (std::sin(std::sin(angle) * static_cast<float>(std::pow(std::cos(angle), 4)) 
+        + std::sin(0.5f * angle) * speedX * 0.1f) * std::sin(angle) * randomness) * widthRatio;
 	}
 	else
 	{
 		angle = (enemyY / 110.0f + offset) * 0.1f;
-		return (std::sin(angle * static_cast<float>(std::pow(std::cos(angle), 3)) + std::sin(angle) * this->speedX) * std::cos(angle) * randomness) * this->widthRatio;
+		return (std::sin(angle * static_cast<float>(std::pow(std::cos(angle), 3)) 
+        + std::sin(angle) * speedX) * std::cos(angle) * randomness) * widthRatio;
 	}
 }
 void Game::checkEnemyBounds(Enemy& enemy)
@@ -348,47 +350,47 @@ void Game::moveHand()
 	{
 		float shakeX = (rand() % 3 - 1) * 0.25f;
 		float shakeY = (rand() % 3 - 1) * 0.2f;
-		this->hairyHand.move(sf::Vector2f(shakeX, shakeY));
+		hairyHand.move(sf::Vector2f(shakeX, shakeY));
 	}
 }
 
 
 void Game::renderBlood(sf::RenderTarget& target)
 {
-	float elapsedTime = this->bloodClock.getElapsedTime().asSeconds();
+	float elapsedTime = bloodClock.getElapsedTime().asSeconds();
 	if (elapsedTime <= 1)
 	{
 		uint8_t alpha = static_cast<uint8_t>(255 * (1.0f - (elapsedTime / 1)));
-		this->bloodBathObj.setColor(sf::Color(255, 255, 255, alpha));
+		bloodBathObj.setColor(sf::Color(255, 255, 255, alpha));
 		target.draw(bloodBathObj);
 	}
 	else
 	{
-		this->makeBloodSplatter = false;
+		makeBloodSplatter = false;
 		bloodBathObj.setColor(sf::Color(255, 255, 255, 255));
 	}
 }
 
 void Game::renderUi(sf::RenderTarget& target)
 {
-	target.draw(this->scoreText);
-	target.draw(this->healthBar);
-	target.draw(this->staminaBar);
-	target.draw(this->healthOutline);
-	target.draw(this->staminaOutline);
-	target.draw(this->healthText);
-	target.draw(this->staminaText);
+	target.draw(scoreText);
+	target.draw(healthBar);
+	target.draw(staminaBar);
+	target.draw(healthOutline);
+	target.draw(staminaOutline);
+	target.draw(healthText);
+	target.draw(staminaText);
 }
 
 
 void Game::renderRects(sf::RenderTarget& target)
 {
-	target.draw(this->hairyHand);
+	target.draw(hairyHand);
 	//render the enemies
-	for (auto& enemy : this->enemies) {
+	for (auto& enemy : enemies) {
 		target.draw(enemy.getEnemySprite());
 	}
-	for (const auto& bitemark : this->bitemarks) {
+	for (const auto& bitemark : bitemarks) {
 		target.draw(bitemark);
 	}
 }

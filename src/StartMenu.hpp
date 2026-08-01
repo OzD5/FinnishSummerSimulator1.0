@@ -12,6 +12,20 @@
 
 class StartMenu
 {
+public:
+	void update();
+	void render();
+	void updateMousePos();
+	void silenceMusic();
+
+	short getResolution() const;
+	short getDifficulty() const;
+	bool getEndMenu() const;
+	bool getStartGame() const;
+	const bool running() const;
+
+	StartMenu(unsigned width, unsigned height, sf::RenderWindow* window);
+	virtual ~StartMenu();
 private:
 	sf::RenderWindow* startwindow;
 	sf::Event eve;
@@ -60,18 +74,4 @@ private:
 	void initSound();
 	void pollEvents();
 	void renderButtons(sf::RenderTarget& target);
-public:
-	void update();
-	void render();
-	void updateMousePos();
-	void silenceMusic();
-
-	short getResolution() const;
-	short getDifficulty() const;
-	bool getEndMenu() const;
-	bool getStartGame() const;
-	const bool running() const;
-
-	StartMenu(unsigned width, unsigned height, sf::RenderWindow* window);
-	virtual ~StartMenu();
 };
