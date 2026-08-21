@@ -30,7 +30,7 @@ void GameManager::changeResoluton(const short resolution)
 
 	// Resolution is either 1, 2 or 3.
 	auto resolutionChoice = std::clamp(resolution - 1, 0, 2);
-	std::tie(this->windowWidth, this->windowHeight) = windowSizes[resolutionChoice];
+	std::tie(this->windowWidth, this->windowHeight) = windowSizes[resolutionChoice]; 
 
 	delete window;
 	this->window = new sf::RenderWindow(sf::VideoMode(this->windowWidth, this->windowHeight), "Finnish Summer Simulator", sf::Style::Titlebar | sf::Style::Default);

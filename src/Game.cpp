@@ -70,6 +70,7 @@ void Game::update()
         updateUi();
         updateSpeed();
         updateEnemies();
+        updateBiteMarks();
         moveHand();
         deleteEnemy();
     }
@@ -320,6 +321,18 @@ void Game::updateEnemyPosition(Enemy& enemy)
 	{
 		health -= 1;
 	}
+}
+
+void Game::updateBiteMarks()
+{
+    std::erase_if(bitemarks,[](auto& mark){
+        auto [r,g,b,a] = mark.getColor();
+        if (a == 1) {
+            return true;
+        }
+        mark.setColor(sf::Color(r,g,b, a - 1));
+        return false;
+    } );
 }
 
 float Game::calculateWaveX(float enemyY, int velocity, int offset) const
